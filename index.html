@@ -689,8 +689,14 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Kategori</label>
-        <select class="form-select" id="txnCategory"></select>
+        <div class="flex justify-between items-center">
+          <label class="form-label" style="margin:0">Kategori</label>
+          <div class="flex gap-2">
+            <button type="button" class="btn btn-sm btn-secondary" id="addCatBtn">+ Baru</button>
+            <button type="button" class="btn btn-sm btn-secondary" id="manageCatBtn">Kelola</button>
+          </div>
+        </div>
+        <select class="form-select" id="txnCategory" style="margin-top:var(--sp-2)"></select>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -705,6 +711,26 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
       <div class="form-group">
         <label class="form-label">Deskripsi</label>
         <input type="text" class="form-input" id="txnDesc" placeholder="Opsional">
+      </div>
+      <div class="form-group">
+        <div class="flex justify-between items-center">
+          <label class="form-label" style="margin:0">Transaksi Berulang</label>
+          <button type="button" class="btn btn-sm btn-secondary" id="manageRecurBtn">Kelola</button>
+        </div>
+        <label class="flex items-center gap-2" style="cursor:pointer;margin-top:var(--sp-2)">
+          <input type="checkbox" id="txnRecurring" style="width:18px;height:18px;flex-shrink:0">
+          <span class="text-muted" style="font-size:var(--fs-sm)">Ulangi otomatis sesuai jadwal</span>
+        </label>
+        <div class="form-row" id="recurringFields" style="display:none;margin-top:var(--sp-2)">
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Setiap</label>
+            <input type="number" class="form-input" id="recurInterval" value="1" min="1" step="1">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Satuan</label>
+            <select class="form-select" id="recurUnit"><option value="day">Hari</option><option value="week">Minggu</option><option value="month" selected>Bulan</option><option value="year">Tahun</option></select>
+          </div>
+        </div>
       </div>
       <input type="hidden" id="txnId">
     </div>
@@ -867,12 +893,13 @@ const ICONS = {
 function catIcon(cat) { return ICONS[cat] || '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10h8M8 14h8"/></svg>'; }
 
 /* ====== CATEGORIES ====== */
-const INCOME_CATS = ['Paycheck','Business','Side Hustle','Dividends','Interest Income','Commission'];
-const EXPENSE_CATS = ['Food','Social Life','Transportation','Household','Apparel','Beauty','Health','Education','Gift','Pet','Self-development','Electronics'];
-const BILL_CATS = ['Internet','Netflix','Subscription','House Rent','Listrik'];
-const DEBT_CATS = ['BCA'];
-const SAVINGS_CATS = ['Travel Fund','Wedding Fund','Car Fund','Stocks','Mutual Funds','Cryptocurrency'];
-const ALL_CATS = { income: INCOME_CATS, expense: EXPENSE_CATS, bill: BILL_CATS, debt: DEBT_CATS, savings: SAVINGS_CATS };
+const DEFAULT_CATS = { income: ['Paycheck','Business','Side Hustle','Dividends','Interest Income','Commission'], expense: ['Food','Social Life','Transportation','Household','Apparel','Beauty','Health','Education','Gift','Pet','Self-development','Electronics'], bill: ['Internet','Netflix','Subscription','House Rent','Listrik'], debt: ['BCA'], savings: ['Travel Fund','Wedding Fund','Car Fund','Stocks','Mutual Funds','Cryptocurrency'] };
+let INCOME_CATS = [...DEFAULT_CATS.income];
+let EXPENSE_CATS = [...DEFAULT_CATS.expense];
+let BILL_CATS = [...DEFAULT_CATS.bill];
+let DEBT_CATS = [...DEFAULT_CATS.debt];
+let SAVINGS_CATS = [...DEFAULT_CATS.savings];
+let ALL_CATS = { income: INCOME_CATS, expense: EXPENSE_CATS, bill: BILL_CATS, debt: DEBT_CATS, savings: SAVINGS_CATS };
 const CAT_COLORS = ['#10b981','#2dd4bf','#0d9488','#14b8a6','#34d399','#6ee7b7','#99f6e4','#5eead4','#22d3ee','#0891b2','#06b6d4','#0ea5e9','#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899','#f43f5e','#f59e0b','#eab308','#84cc16'];
 
 /* ====== KEYWORDS FOR AUTO-CATEGORIZE ====== */
@@ -911,7 +938,7 @@ const MONTH_NAMES = ['Januari','Februari','Maret','April','Mei','Juni','Juli','A
 const MONTH_SHORT = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 
 /* ====== INDEXEDDB ====== */
-function openDB() { return new Promise((resolve, reject) => { const req = indexedDB.open('VaultinDB', 2); req.onupgradeneeded = (e) => { const d = e.target.result; if (!d.objectStoreNames.contains('transactions')) { const s = d.createObjectStore('transactions', { keyPath: 'id', autoIncrement: true }); s.createIndex('byMonth', 'monthKey', { unique: false }); s.createIndex('byCategory', 'category', { unique: false }); s.createIndex('byType', 'type', { unique: false }); } if (!d.objectStoreNames.contains('budgets')) { d.createObjectStore('budgets', { keyPath: 'monthKey' }); } if (!d.objectStoreNames.contains('savingsGoals')) { d.createObjectStore('savingsGoals', { keyPath: 'id', autoIncrement: true }); } if (!d.objectStoreNames.contains('settings')) { d.createObjectStore('settings', { keyPath: 'key' }); } if (!d.objectStoreNames.contains('assets')) { d.createObjectStore('assets', { keyPath: 'id', autoIncrement: true }); } }; req.onsuccess = (e) => { db = e.target.result; resolve(db); }; req.onerror = (e) => reject(e.target.error); }); }
+function openDB() { return new Promise((resolve, reject) => { const req = indexedDB.open('VaultinDB', 3); req.onupgradeneeded = (e) => { const d = e.target.result; if (!d.objectStoreNames.contains('transactions')) { const s = d.createObjectStore('transactions', { keyPath: 'id', autoIncrement: true }); s.createIndex('byMonth', 'monthKey', { unique: false }); s.createIndex('byCategory', 'category', { unique: false }); s.createIndex('byType', 'type', { unique: false }); } if (!d.objectStoreNames.contains('budgets')) { d.createObjectStore('budgets', { keyPath: 'monthKey' }); } if (!d.objectStoreNames.contains('savingsGoals')) { d.createObjectStore('savingsGoals', { keyPath: 'id', autoIncrement: true }); } if (!d.objectStoreNames.contains('settings')) { d.createObjectStore('settings', { keyPath: 'key' }); } if (!d.objectStoreNames.contains('assets')) { d.createObjectStore('assets', { keyPath: 'id', autoIncrement: true }); } if (!d.objectStoreNames.contains('recurring')) { d.createObjectStore('recurring', { keyPath: 'id', autoIncrement: true }); } }; req.onsuccess = (e) => { db = e.target.result; resolve(db); }; req.onerror = (e) => reject(e.target.error); }); }
 function dbGet(store, key) { return new Promise((resolve, reject) => { const tx = db.transaction(store, 'readonly'); const req = tx.objectStore(store).get(key); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); }); }
 function dbGetAll(store) { return new Promise((resolve, reject) => { const tx = db.transaction(store, 'readonly'); const req = tx.objectStore(store).getAll(); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); }); }
 function dbPut(store, val) { return new Promise((resolve, reject) => { const tx = db.transaction(store, 'readwrite'); tx.objectStore(store).put(val); tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error); }); }
@@ -1045,7 +1072,7 @@ function drawBarChart(canvasId, monthsData) {
 
 /* ====== TRANSACTION MODAL ====== */
 function openTxnModal(presetType) {
-  editingTxnId = null; document.getElementById('txnModalTitle').textContent = 'Tambah Transaksi'; document.getElementById('txnId').value = ''; document.getElementById('txnAmount').value = ''; document.getElementById('txnDesc').value = ''; document.getElementById('txnDate').value = new Date().toISOString().split('T')[0]; document.getElementById('deleteTxnBtn').style.display = 'none';
+  editingTxnId = null; document.getElementById('txnModalTitle').textContent = 'Tambah Transaksi'; document.getElementById('txnId').value = ''; document.getElementById('txnAmount').value = ''; document.getElementById('txnDesc').value = ''; document.getElementById('txnDate').value = new Date().toISOString().split('T')[0]; document.getElementById('deleteTxnBtn').style.display = 'none'; var _rc0 = document.getElementById('txnRecurring'); if (_rc0) _rc0.checked = false; var _rf0 = document.getElementById('recurringFields'); if (_rf0) _rf0.style.display = 'none';
   if (presetType) { selectedTxnType = presetType; } else { selectedTxnType = 'expense'; }
   updateTxnTypeButtons(); populateCategoryDropdown(); document.getElementById('txnModal').classList.add('active');
 }
@@ -1061,6 +1088,7 @@ async function saveTxn() {
   try {
     if (editingTxnId) { txn.id = editingTxnId; await dbPut('transactions', txn); }
     else { await dbAdd('transactions', txn); }
+    if (!editingTxnId) { var _rc1 = document.getElementById('txnRecurring'); if (_rc1 && _rc1.checked) { var _unit = document.getElementById('recurUnit').value; var _iv = Math.max(1, parseInt(document.getElementById('recurInterval').value, 10) || 1); try { await dbAdd('recurring', { type: selectedTxnType, category: category, amount: amount, description: desc, unit: _unit, intervalN: _iv, startDate: date, nextDate: addInterval(date, _unit, _iv), active: true, createdAt: new Date().toISOString() }); } catch (_) {} } }
     if (selectedTxnType === 'savings') { const goals = await getSavingsGoals(); let goal = goals.find(g => g.name === category); if (goal) { if (editingTxnId) { const oldTxn = await dbGet('transactions', editingTxnId); goal.totalSaved = (goal.totalSaved||0) - (oldTxn?oldTxn.amount:0) + amount; } else { goal.totalSaved = (goal.totalSaved||0) + amount; } await dbPut('savingsGoals', goal); } }
     closeTxnModal(); await renderTab(currentTab); await renderMonthLabel();
   } catch(e) { alert('Error menyimpan: ' + e.message); }
@@ -1090,8 +1118,8 @@ async function saveSavingsGoal(category, idx) {
 }
 
 /* ====== EXPORT / IMPORT ====== */
-async function exportData() { const [txns, budgets, goals, assets, settings] = await Promise.all([dbGetAll('transactions'), dbGetAll('budgets'), dbGetAll('savingsGoals'), dbGetAll('assets'), dbGetAll('settings')]); const data = { version: 3, app: 'Vaultin', exportedAt: new Date().toISOString(), transactions: txns, budgets, savingsGoals: goals, assets, settings }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'vaultin-backup-' + new Date().toISOString().split('T')[0] + '.json'; a.click(); URL.revokeObjectURL(url); }
-async function importData(file) { try { const text = await file.text(); if (file.name.endsWith('.json')) { const data = JSON.parse(text); if (!data.transactions) { alert('Format tidak valid'); return; } if (confirm('Import akan menambah data ke yang ada. Lanjutkan?')) { for (const t of data.transactions) { await dbPut('transactions', t); } for (const b of data.budgets||[]) { await dbPut('budgets', b); } for (const g of data.savingsGoals||[]) { await dbPut('savingsGoals', g); } for (const a of data.assets||[]) { await dbPut('assets', a); } for (const s of data.settings||[]) { await dbPut('settings', s); } alert('Data berhasil diimport!'); if (typeof loadTheme === 'function') await loadTheme(); await renderTab(currentTab); } } else if (file.name.endsWith('.csv')) { const lines = text.split('\n').filter(l => l.trim()); for (let i = 1; i < lines.length; i++) { const vals = lines[i].match(/("[^"]*")|[^,]+/g); if (!vals || vals.length < 5) continue; const cv = v => v.replace(/^"|"$/g,'').replace(/""/g,'"'); const d = new Date(vals[4]); await dbAdd('transactions', { type: cv(vals[1]), category: cv(vals[2]), amount: parseNumber(vals[3]), date: vals[4], description: vals[5]?cv(vals[5]):'', monthKey: monthKey(d.getFullYear(), d.getMonth()), createdAt: new Date().toISOString() }); } alert('CSV berhasil diimport!'); await renderTab(currentTab); } } catch(e) { alert('Error importing: ' + e.message); } }
+async function exportData() { const [txns, budgets, goals, assets, settings, recurring] = await Promise.all([dbGetAll('transactions'), dbGetAll('budgets'), dbGetAll('savingsGoals'), dbGetAll('assets'), dbGetAll('settings'), dbGetAll('recurring').catch(function(){return [];})]); const data = { version: 4, app: 'Vaultin', exportedAt: new Date().toISOString(), transactions: txns, budgets, savingsGoals: goals, assets, settings, recurring: recurring }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'vaultin-backup-' + new Date().toISOString().split('T')[0] + '.json'; a.click(); URL.revokeObjectURL(url); }
+async function importData(file) { try { const text = await file.text(); if (file.name.endsWith('.json')) { const data = JSON.parse(text); if (!data.transactions) { alert('Format tidak valid'); return; } if (confirm('Import akan menambah data ke yang ada. Lanjutkan?')) { for (const t of data.transactions) { await dbPut('transactions', t); } for (const b of data.budgets||[]) { await dbPut('budgets', b); } for (const g of data.savingsGoals||[]) { await dbPut('savingsGoals', g); } for (const a of data.assets||[]) { await dbPut('assets', a); } for (const s of data.settings||[]) { await dbPut('settings', s); } for (const r of data.recurring||[]) { await dbPut('recurring', r); } alert('Data berhasil diimport!'); if (typeof loadTheme === 'function') await loadTheme(); await renderTab(currentTab); } } else if (file.name.endsWith('.csv')) { const lines = text.split('\n').filter(l => l.trim()); for (let i = 1; i < lines.length; i++) { const vals = lines[i].match(/("[^"]*")|[^,]+/g); if (!vals || vals.length < 5) continue; const cv = v => v.replace(/^"|"$/g,'').replace(/""/g,'"'); const d = new Date(vals[4]); await dbAdd('transactions', { type: cv(vals[1]), category: cv(vals[2]), amount: parseNumber(vals[3]), date: vals[4], description: vals[5]?cv(vals[5]):'', monthKey: monthKey(d.getFullYear(), d.getMonth()), createdAt: new Date().toISOString() }); } alert('CSV berhasil diimport!'); await renderTab(currentTab); } } catch(e) { alert('Error importing: ' + e.message); } }
 
 /* ====== SCAN STRUK (OCR) ====== */
 function openScanModal() { resetScanModal(); document.getElementById('scanDate').value = new Date().toISOString().split('T')[0]; document.getElementById('scanModal').classList.add('active'); }
@@ -1715,6 +1743,7 @@ function initEvents() {
   document.getElementById('closeTxnModal').addEventListener('click', closeTxnModal);
   document.getElementById('cancelTxnBtn').addEventListener('click', closeTxnModal);
   document.getElementById('saveTxnBtn').addEventListener('click', saveTxn);
+  (function(){ var rc = document.getElementById('txnRecurring'); if (rc) rc.addEventListener('change', function(){ var f = document.getElementById('recurringFields'); if (f) f.style.display = rc.checked ? 'flex' : 'none'; }); var mrb = document.getElementById('manageRecurBtn'); if (mrb) mrb.addEventListener('click', openManageRecurring); var acb = document.getElementById('addCatBtn'); if (acb) acb.addEventListener('click', async function(){ var n = prompt('Nama kategori baru:'); if (n && n.trim()) { var ok = await addCategory(selectedTxnType, n.trim()); populateCategoryDropdown(); if (ok) { var sel = document.getElementById('txnCategory'); if (sel) sel.value = n.trim(); } } }); var mcb = document.getElementById('manageCatBtn'); if (mcb) mcb.addEventListener('click', openManageCats); })();
   document.getElementById('deleteTxnBtn').addEventListener('click', deleteTxn);
   document.getElementById('txnModal').addEventListener('click', e => { if (e.target.id === 'txnModal') closeTxnModal(); });
   ['Expense','Income','Bill','Debt','Savings'].forEach(t => { document.getElementById('type' + t).addEventListener('click', () => { selectedTxnType = t.toLowerCase(); updateTxnTypeButtons(); populateCategoryDropdown(); }); });
@@ -1734,7 +1763,99 @@ function initEvents() {
 }
 
 /* ====== INIT ====== */
-async function init() { await openDB(); await loadTheme(); await seedData(); initEvents(); await renderMonthLabel(); await switchTab('dashboard'); }
+/* ====== KATEGORI DINAMIS ====== */
+async function loadCategories() {
+  const custom = (await getSetting('catCustom')) || {};
+  const deleted = (await getSetting('catDeleted')) || {};
+  for (const type of Object.keys(DEFAULT_CATS)) {
+    const del = deleted[type] || [];
+    const base = DEFAULT_CATS[type].filter(c => !del.includes(c));
+    const add = (custom[type] || []).filter(c => !base.includes(c));
+    ALL_CATS[type].length = 0;
+    ALL_CATS[type].push(...base, ...add);
+  }
+}
+async function addCategory(type, name) {
+  name = (name || '').trim(); if (!name) return false;
+  if ((ALL_CATS[type] || []).includes(name)) { alert('Kategori sudah ada.'); return false; }
+  const custom = (await getSetting('catCustom')) || {};
+  custom[type] = custom[type] || []; if (!custom[type].includes(name)) custom[type].push(name);
+  const deleted = (await getSetting('catDeleted')) || {};
+  if (deleted[type]) deleted[type] = deleted[type].filter(c => c !== name);
+  await dbPut('settings', { key: 'catCustom', value: custom });
+  await dbPut('settings', { key: 'catDeleted', value: deleted });
+  await loadCategories(); return true;
+}
+async function deleteCategory(type, name) {
+  const custom = (await getSetting('catCustom')) || {};
+  if (custom[type] && custom[type].includes(name)) { custom[type] = custom[type].filter(c => c !== name); }
+  else { const deleted = (await getSetting('catDeleted')) || {}; deleted[type] = deleted[type] || []; if (!deleted[type].includes(name)) deleted[type].push(name); await dbPut('settings', { key: 'catDeleted', value: deleted }); }
+  await dbPut('settings', { key: 'catCustom', value: custom });
+  await loadCategories();
+}
+function openManageCats() {
+  const type = selectedTxnType; const label = type.charAt(0).toUpperCase() + type.slice(1);
+  let ov = document.getElementById('manageCatsOverlay'); if (ov) ov.remove();
+  ov = document.createElement('div'); ov.id = 'manageCatsOverlay'; ov.className = 'modal-overlay active';
+  ov.innerHTML = '<div class="modal"><div class="modal-header"><div class="modal-title">Kelola Kategori ' + label + '</div><button class="icon-btn" id="closeManageCats" aria-label="Tutup">\u2715</button></div><div class="modal-body" id="manageCatsBody"></div><div class="modal-footer"><button class="btn btn-primary" id="addCatInManage" style="flex:1">+ Tambah Kategori</button></div></div>';
+  document.body.appendChild(ov);
+  renderManageCatsBody(type);
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+  document.getElementById('closeManageCats').addEventListener('click', () => ov.remove());
+  document.getElementById('addCatInManage').addEventListener('click', async () => { const n = prompt('Nama kategori baru:'); if (n && n.trim()) { await addCategory(type, n.trim()); renderManageCatsBody(type); populateCategoryDropdown(); } });
+}
+function renderManageCatsBody(type) {
+  const body = document.getElementById('manageCatsBody'); if (!body) return;
+  const cats = ALL_CATS[type] || [];
+  body.innerHTML = cats.length ? cats.map(c => '<div class="flex justify-between items-center" style="padding:var(--sp-2) 0;border-bottom:1px solid var(--border)"><span>' + escapeHtml(c) + '</span><button class="btn btn-danger btn-sm" data-del-cat="' + escapeHtml(c) + '">Hapus</button></div>').join('') : '<div class="text-muted">Belum ada kategori.</div>';
+  body.querySelectorAll('[data-del-cat]').forEach(b => b.addEventListener('click', async () => { const name = b.getAttribute('data-del-cat'); if (confirm('Hapus kategori "' + name + '"? Transaksi lama tidak ikut terhapus.')) { await deleteCategory(type, name); renderManageCatsBody(type); populateCategoryDropdown(); } }));
+}
+/* ====== TRANSAKSI BERULANG ====== */
+function addInterval(dateStr, unit, n) {
+  const d = new Date(dateStr + 'T00:00:00'); n = Math.max(1, n || 1);
+  if (unit === 'day') d.setDate(d.getDate() + n);
+  else if (unit === 'week') d.setDate(d.getDate() + 7 * n);
+  else if (unit === 'month') d.setMonth(d.getMonth() + n);
+  else if (unit === 'year') d.setFullYear(d.getFullYear() + n);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+async function applyRecurring() {
+  let rules; try { rules = await dbGetAll('recurring'); } catch (_) { return 0; }
+  if (!rules || !rules.length) return 0;
+  const now = new Date(); const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+  let created = 0;
+  for (const r of rules) {
+    if (r.active === false || !r.nextDate) continue;
+    let guard = 0;
+    while (r.nextDate <= today && guard < 600) {
+      const d = new Date(r.nextDate + 'T00:00:00'); const mk = monthKey(d.getFullYear(), d.getMonth());
+      await dbAdd('transactions', { type: r.type, category: r.category, amount: r.amount, date: r.nextDate, description: (r.description ? r.description + ' ' : '') + '(berulang)', monthKey: mk, createdAt: new Date().toISOString(), recurringId: r.id });
+      if (r.type === 'savings') { try { const goals = await getSavingsGoals(); const goal = goals.find(g => g.name === r.category); if (goal) { goal.totalSaved = (goal.totalSaved || 0) + r.amount; await dbPut('savingsGoals', goal); } } catch (_) {} }
+      r.nextDate = addInterval(r.nextDate, r.unit, r.intervalN); created++; guard++;
+    }
+    await dbPut('recurring', r);
+  }
+  return created;
+}
+function openManageRecurring() {
+  let ov = document.getElementById('manageRecurOverlay'); if (ov) ov.remove();
+  ov = document.createElement('div'); ov.id = 'manageRecurOverlay'; ov.className = 'modal-overlay active';
+  ov.innerHTML = '<div class="modal"><div class="modal-header"><div class="modal-title">Transaksi Berulang</div><button class="icon-btn" id="closeManageRecur" aria-label="Tutup">\u2715</button></div><div class="modal-body" id="manageRecurBody"></div></div>';
+  document.body.appendChild(ov);
+  renderManageRecurBody();
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+  document.getElementById('closeManageRecur').addEventListener('click', () => ov.remove());
+}
+async function renderManageRecurBody() {
+  const body = document.getElementById('manageRecurBody'); if (!body) return;
+  let rules = []; try { rules = await dbGetAll('recurring'); } catch (_) {}
+  if (!rules.length) { body.innerHTML = '<div class="text-muted" style="padding:var(--sp-2) 0">Belum ada transaksi berulang. Aktifkan lewat toggle Ulangi saat menambah transaksi.</div>'; return; }
+  const ul = { day: 'hari', week: 'minggu', month: 'bulan', year: 'tahun' };
+  body.innerHTML = rules.map(r => '<div style="padding:var(--sp-3) 0;border-bottom:1px solid var(--border)"><div class="flex justify-between items-center"><div><div class="fw-bold">' + escapeHtml(r.category || '-') + ' \u00b7 ' + formatRupiah(r.amount || 0) + '</div><div class="text-muted" style="font-size:var(--fs-xs);margin-top:2px">' + escapeHtml(r.type || '') + ' \u00b7 setiap ' + (r.intervalN || 1) + ' ' + (ul[r.unit] || r.unit || '') + ' \u00b7 berikutnya ' + (r.nextDate || '-') + (r.active === false ? ' \u00b7 DIJEDA' : '') + '</div></div><div class="flex gap-2"><button class="btn btn-sm btn-secondary" data-toggle-recur="' + r.id + '">' + (r.active === false ? 'Aktifkan' : 'Jeda') + '</button><button class="btn btn-sm btn-danger" data-del-recur="' + r.id + '">Hapus</button></div></div></div>').join('');
+  body.querySelectorAll('[data-del-recur]').forEach(b => b.addEventListener('click', async () => { if (confirm('Hapus aturan berulang ini? Transaksi yang sudah tercatat tetap ada.')) { await dbDelete('recurring', Number(b.getAttribute('data-del-recur'))); renderManageRecurBody(); } }));
+  body.querySelectorAll('[data-toggle-recur]').forEach(b => b.addEventListener('click', async () => { const r = await dbGet('recurring', Number(b.getAttribute('data-toggle-recur'))); if (r) { r.active = (r.active === false); await dbPut('recurring', r); renderManageRecurBody(); } }));
+}
+async function init() { await openDB(); await loadCategories(); await loadTheme(); await seedData(); await applyRecurring(); initEvents(); await renderMonthLabel(); await switchTab('dashboard'); }
 init();
 </script>
 </body>
