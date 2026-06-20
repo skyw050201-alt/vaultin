@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Vaultin">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Vaultin%22,%22short_name%22:%22Vaultin%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23031c1b%22,%22theme_color%22:%22%23042f2e%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns%3D%27http://www.w3.org/2000/svg%27%20viewBox%3D%270%200%20192%20192%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%2310b981%27/%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%230d9488%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%27192%27%20height%3D%27192%27%20rx%3D%2744%27%20fill%3D%27url(%23g)%27/%3E%3Cpath%20d%3D%27M64%2060v72h64V60H64zm48%2060H80V72h32v48z%27%20fill%3D%27white%27%20opacity%3D%27.95%27/%3E%3C/svg%3E%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%20maskable%22}]}"/>
 <title>Vaultin — Pencatat Keuangan Pribadi</title>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.0/dist/tesseract.min.js"></script>
+<!-- OCR Tesseract diganti dengan Gemini AI Vision -->
 <style>
 /* =============================
    VAULTIN — DESIGN SYSTEM v2.0
@@ -145,9 +145,8 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 /* =============================
    LAYOUT
    ============================= */
-.app { max-width: 480px; margin: 0 auto; min-height: 100vh; }
-@media (min-width: 768px) { .app { max-width: 900px; } }
-@media (min-width: 1024px) { .app { max-width: 1100px; } }
+.app { display: flex; min-height: 100vh; }
+.content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 
 /* =============================
    HEADER — Glass
@@ -210,29 +209,59 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 .month-label { font-size: var(--fs-base); font-weight: 600; min-width: 130px; text-align: center; letter-spacing: -.01em; }
 
 /* =============================
-   TABS — Glass pill scroll
+   SIDEBAR + DRAWER NAV
    ============================= */
-.tabs {
-  display: flex; gap: var(--sp-2); overflow-x: auto;
-  -webkit-overflow-scrolling: touch; scrollbar-width: none;
-  padding: var(--sp-3) var(--sp-4);
-  background: var(--surface-alt);
-  border-bottom: 1px solid var(--border);
+.tabs { display: none; }
+.sidebar {
+  width: 240px; flex-shrink: 0; position: sticky; top: 0; align-self: flex-start;
+  height: 100vh; display: flex; flex-direction: column;
+  background: var(--surface-alt); border-right: 1px solid var(--border); z-index: 200;
 }
-.tabs::-webkit-scrollbar { display: none; }
-.tab {
-  padding: var(--sp-2) var(--sp-4); border-radius: var(--r-full);
-  font-size: var(--fs-sm); font-weight: 600; white-space: nowrap;
-  color: var(--muted); background: var(--surface); border: 1px solid var(--border);
+.sidebar-head { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-4); border-bottom: 1px solid var(--border); }
+.sidebar-nav { flex: 1; overflow-y: auto; padding: var(--sp-3); display: flex; flex-direction: column; gap: var(--sp-1); }
+.nav-group { display: flex; flex-direction: column; }
+.nav-group + .nav-group { margin-top: var(--sp-2); }
+.nav-group-header {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3); font-size: var(--fs-xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+  cursor: pointer; user-select: none; border-radius: var(--r-sm);
+}
+.nav-group-header:hover { color: var(--fg); }
+.nav-group-header .chev { width: 14px; height: 14px; flex-shrink: 0; transition: transform var(--dur-fast) var(--ease-out); }
+.nav-group.collapsed .chev { transform: rotate(-90deg); }
+.nav-group-items { display: flex; flex-direction: column; gap: 2px; }
+.nav-group.collapsed .nav-group-items { display: none; }
+.nav-item {
+  display: flex; align-items: center; gap: var(--sp-3); width: 100%; text-align: left;
+  padding: var(--sp-2) var(--sp-3); border-radius: var(--r-md);
+  font-size: var(--fs-sm); font-weight: 600; color: var(--fg-secondary);
   transition: all var(--dur-fast) var(--ease-out);
-  display: flex; align-items: center; gap: var(--sp-2);
 }
-.tab:hover { color: var(--fg); background: var(--surface-hover); }
-.tab.active {
-  background: var(--brand-grad); color: white; border-color: transparent;
-  box-shadow: 0 2px 12px var(--brand-glow);
+.nav-item:hover { background: var(--surface-hover); color: var(--fg); }
+.nav-item.active { background: var(--brand-grad); color: white; box-shadow: 0 2px 12px var(--brand-glow); }
+.nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+.sidebar-foot { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-3) var(--sp-4); border-top: 1px solid var(--border); }
+.sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 150; opacity: 0; pointer-events: none; transition: opacity var(--dur-fast) var(--ease-out); }
+.sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+.topbar {
+  position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--glass-border);
 }
-.tab svg { width: 14px; height: 14px; flex-shrink: 0; }
+.menu-btn { width: 38px; height: 38px; border-radius: var(--r-md); display: flex; align-items: center; justify-content: center; background: var(--surface); border: 1px solid var(--border); color: var(--fg-secondary); flex-shrink: 0; }
+.menu-btn:hover { background: var(--surface-hover); color: var(--fg); }
+.menu-btn svg { width: 20px; height: 20px; }
+@media (max-width: 767px) {
+  .sidebar { position: fixed; top: 0; left: 0; height: 100vh; transform: translateX(-100%); transition: transform .25s var(--ease-out); box-shadow: var(--shadow-lg); }
+  .sidebar.open { transform: translateX(0); }
+}
+@media (min-width: 768px) {
+  .topbar { display: none; }
+  .sidebar-overlay { display: none; }
+  #sidebarClose { display: none; }
+}
 
 /* =============================
    MAIN
@@ -386,7 +415,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
   background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
   border-top: 1px solid var(--glass-border);
-  display: flex; justify-content: space-around;
+  display: none; justify-content: space-around;
   padding: var(--sp-2) 0 calc(var(--sp-2) + env(safe-area-inset-bottom));
 }
 .bottom-nav-item {
@@ -523,28 +552,64 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 </head>
 <body>
 <div class="app">
-  <!-- HEADER -->
-  <header class="header">
-    <div class="brand">
-      <div class="brand-logo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 7v10M16 7v10M8 12h8"/></svg>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 7v10M16 7v10M8 12h8"/></svg>
+        </div>
+        <div class="brand-name">Vault<span>in</span></div>
       </div>
-      <div class="brand-name">Vault<span>in</span></div>
+      <button class="menu-btn" id="sidebarClose" aria-label="Tutup menu" style="margin-left:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <div class="header-actions">
-      <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-      </button>
-      <button class="icon-btn" id="exportBtn" aria-label="Export data">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-      </button>
-      <button class="icon-btn" aria-label="Import data">
-        <label for="importFile">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-        </label>
-      </button>
+    <nav class="sidebar-nav" id="sidebarNav">
+      <div class="nav-group" data-group="ringkasan">
+        <div class="nav-group-header"><span>Ringkasan</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="nav-group-items">
+          <button class="nav-item active" data-tab="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Dashboard</button>
+          <button class="nav-item" data-tab="ytd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>YTD</button>
+        </div>
+      </div>
+      <div class="nav-group" data-group="aruskas">
+        <div class="nav-group-header"><span>Arus Kas</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="nav-group-items">
+          <button class="nav-item" data-tab="income"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Income</button>
+          <button class="nav-item" data-tab="expense"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>Expense</button>
+          <button class="nav-item" data-tab="bills"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 12 7 14 9"/></svg>Bills</button>
+          <button class="nav-item" data-tab="debt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Debt</button>
+        </div>
+      </div>
+      <div class="nav-group" data-group="kekayaan">
+        <div class="nav-group-header"><span>Kekayaan</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="nav-group-items">
+          <button class="nav-item" data-tab="savings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21V12h6v9"/></svg>Savings</button>
+          <button class="nav-item" data-tab="asset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Aset</button>
+        </div>
+      </div>
+      <div class="nav-group" data-group="kewajiban">
+        <div class="nav-group-header"><span>Kewajiban</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="nav-group-items">
+          <button class="nav-item" data-tab="tax"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>Pajak</button>
+          <button class="nav-item" data-tab="zakat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>Zakat</button>
+        </div>
+      </div>
+    </nav>
+    <div class="sidebar-foot">
+      <button class="icon-btn" id="themeToggle" aria-label="Toggle theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button>
+      <button class="icon-btn" id="exportBtn" aria-label="Export data"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
+      <button class="icon-btn" aria-label="Import data"><label for="importFile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg></label></button>
       <input type="file" id="importFile" accept=".json,.csv" style="display:none">
     </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- CONTENT -->
+  <div class="content">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="menu-btn" id="menuBtn" aria-label="Buka menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <div class="brand"><div class="brand-name">Vault<span>in</span></div></div>
   </header>
 
   <!-- MONTH NAV -->
@@ -585,6 +650,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
     <div id="tab-tax" class="tab-content hidden"></div>
     <div id="tab-zakat" class="tab-content hidden"></div>
   </main>
+  </div>
 
   <!-- FAB -->
   <button class="fab-scan" id="fabScan" aria-label="Scan struk">
@@ -880,7 +946,7 @@ function sumByType(transactions, type) { return transactions.filter(t => t.type 
 async function getRollover(monthK) { const [y, m] = monthK.split('-').map(Number); let pm = m - 2, py = y; if (pm < 0) { pm += 12; py -= 1; } const prevKey = monthKey(py, pm); const prevTxns = await getTransactions(prevKey); const prevBudget = await getBudget(prevKey); const prevIncome = sumByType(prevTxns, 'income') + (prevBudget.incomeRollover || 0); const prevExpense = sumByType(prevTxns, 'expense'); const prevBills = sumByType(prevTxns, 'bill'); const prevDebt = sumByType(prevTxns, 'debt'); const prevSavings = sumByType(prevTxns, 'savings'); return Math.max(0, prevIncome - prevExpense - prevBills - prevDebt - prevSavings); }
 
 /* ====== RENDERING ====== */
-async function switchTab(tab) { currentTab = tab; document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden')); document.getElementById('tab-' + tab).classList.remove('hidden'); document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.dataset.tab === tab)); document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.toggle('active', el.dataset.tab === tab)); await renderTab(tab); }
+async function switchTab(tab) { currentTab = tab; document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden')); document.getElementById('tab-' + tab).classList.remove('hidden'); document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.dataset.tab === tab)); document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.tab === tab)); document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.toggle('active', el.dataset.tab === tab)); closeSidebar(); await renderTab(tab); }
 async function renderTab(tab) { switch(tab) { case 'dashboard': await renderDashboard(); break; case 'income': await renderCategoryTab('income', 'Income', INCOME_CATS); break; case 'expense': await renderCategoryTab('expense', 'Expense', EXPENSE_CATS); break; case 'bills': await renderCategoryTab('bill', 'Bills', BILL_CATS); break; case 'debt': await renderCategoryTab('debt', 'Debt', DEBT_CATS); break; case 'savings': await renderSavings(); break; case 'ytd': await renderYTD(); break; case 'asset': await renderAssets(); break; case 'tax': await renderTax(); break; case 'zakat': await renderZakat(); break; } }
 
 async function renderDashboard() {
@@ -1033,7 +1099,7 @@ async function exportData() { const [txns, budgets, goals, assets, settings] = a
 async function importData(file) { try { const text = await file.text(); if (file.name.endsWith('.json')) { const data = JSON.parse(text); if (!data.transactions) { alert('Format tidak valid'); return; } if (confirm('Import akan menambah data ke yang ada. Lanjutkan?')) { for (const t of data.transactions) { await dbPut('transactions', t); } for (const b of data.budgets||[]) { await dbPut('budgets', b); } for (const g of data.savingsGoals||[]) { await dbPut('savingsGoals', g); } for (const a of data.assets||[]) { await dbPut('assets', a); } for (const s of data.settings||[]) { await dbPut('settings', s); } alert('Data berhasil diimport!'); if (typeof loadTheme === 'function') await loadTheme(); await renderTab(currentTab); } } else if (file.name.endsWith('.csv')) { const lines = text.split('\n').filter(l => l.trim()); for (let i = 1; i < lines.length; i++) { const vals = lines[i].match(/("[^"]*")|[^,]+/g); if (!vals || vals.length < 5) continue; const cv = v => v.replace(/^"|"$/g,'').replace(/""/g,'"'); const d = new Date(vals[4]); await dbAdd('transactions', { type: cv(vals[1]), category: cv(vals[2]), amount: parseNumber(vals[3]), date: vals[4], description: vals[5]?cv(vals[5]):'', monthKey: monthKey(d.getFullYear(), d.getMonth()), createdAt: new Date().toISOString() }); } alert('CSV berhasil diimport!'); await renderTab(currentTab); } } catch(e) { alert('Error importing: ' + e.message); } }
 
 /* ====== SCAN STRUK (OCR) ====== */
-function openScanModal() { resetScanModal(); preloadOcrWorker(); document.getElementById('scanDate').value = new Date().toISOString().split('T')[0]; document.getElementById('scanModal').classList.add('active'); }
+function openScanModal() { resetScanModal(); document.getElementById('scanDate').value = new Date().toISOString().split('T')[0]; document.getElementById('scanModal').classList.add('active'); }
 function closeScanModal() { document.getElementById('scanModal').classList.remove('active'); }
 function resetScanModal() {
   const preview = document.getElementById('scanPreview');
@@ -1053,9 +1119,88 @@ function handleScanFile(e) {
     preview.classList.add('has-image');
     preview.innerHTML = '<img src="' + ev.target.result + '" alt="Preview struk"><input type="file" id="scanFileInput" accept="image/*" style="display:none">';
     document.getElementById('scanFileInput').addEventListener('change', handleScanFile);
-    processScanOCR(ev.target.result, file.name);
+    processScanAI(ev.target.result, file.name);
   };
   reader.readAsDataURL(file);
+}
+/* ====== SCAN STRUK (AI Vision - Gemini) ====== */
+const GEMINI_MODEL = 'gemini-2.0-flash';
+async function getGeminiKey() { try { return await getSetting('geminiApiKey'); } catch { return null; } }
+function promptGeminiKey() {
+  return new Promise((resolve) => {
+    const statusEl = document.getElementById('scanStatus');
+    statusEl.style.display = 'block';
+    statusEl.innerHTML = '<div style="padding:var(--sp-3) 0"><div style="font-weight:600;margin-bottom:var(--sp-2)">Masukkan Gemini API Key</div><div style="font-size:var(--fs-sm);color:var(--muted);margin-bottom:var(--sp-3)">Gratis &amp; cepat. Key disimpan lokal di perangkatmu (tidak dikirim ke mana pun selain Google).</div><input type="password" class="form-input" id="geminiKeyInput" placeholder="AIza..." autocomplete="off" style="margin-bottom:var(--sp-2)"><button class="btn btn-primary" id="saveGeminiKeyBtn" style="width:100%">Simpan &amp; Lanjut</button><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:var(--sp-3);font-size:var(--fs-sm);color:var(--emerald);text-decoration:none">Dapatkan API Key gratis di Google AI Studio</a></div>';
+    const submit = async () => { const val = document.getElementById('geminiKeyInput').value.trim(); if (!val) { document.getElementById('geminiKeyInput').focus(); return; } await saveSetting('geminiApiKey', val); resolve(val); };
+    document.getElementById('saveGeminiKeyBtn').addEventListener('click', submit);
+    document.getElementById('geminiKeyInput').addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+  });
+}
+async function processScanAI(imageDataUrl, fileName) {
+  const statusEl = document.getElementById('scanStatus');
+  statusEl.style.display = 'flex'; statusEl.innerHTML = '<div class="spinner"></div><div>Menyiapkan AI...</div>';
+  document.getElementById('scanResult').style.display = 'none'; document.getElementById('scanForm').style.display = 'none'; document.getElementById('saveScanBtn').disabled = true;
+  try {
+    let apiKey = await getGeminiKey();
+    if (!apiKey) { apiKey = await promptGeminiKey(); }
+    statusEl.style.display = 'flex'; statusEl.innerHTML = '<div class="spinner"></div><div>Membaca struk dengan AI...</div>';
+    const base64 = imageDataUrl.split(',')[1];
+    const mimeMatch = imageDataUrl.match(/^data:([^;]+);/); const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+    const parsed = await callGeminiVision(apiKey, base64, mimeType);
+    statusEl.style.display = 'none';
+    renderScanResult(parsed);
+  } catch (err) {
+    const msg = (err && err.message) ? err.message : 'Terjadi kesalahan';
+    if (/api[ _]?key|401|403|permission|invalid|unregistered/i.test(msg)) { try { await saveSetting('geminiApiKey', null); } catch (_) {} }
+    statusEl.style.display = 'none';
+    const resultEl = document.getElementById('scanResult'); resultEl.style.display = 'block';
+    resultEl.innerHTML = '<div style="padding:var(--sp-4);text-align:center"><div style="font-size:20px;margin-bottom:var(--sp-2)">Scan AI gagal</div><div style="font-size:var(--fs-sm);color:var(--muted);margin-top:var(--sp-2)">' + escapeHtml(msg) + '<br>Kamu bisa input manual di bawah.</div></div>';
+    document.getElementById('scanForm').style.display = 'block'; document.getElementById('saveScanBtn').disabled = false;
+  }
+}
+async function callGeminiVision(apiKey, base64, mimeType) {
+  const prompt = 'Kamu adalah asisten pembaca struk belanja Indonesia. Baca gambar struk ini lalu kembalikan HANYA JSON valid tanpa teks lain dan tanpa markdown. Format: {"merchant": nama toko (string atau null), "total": total akhir yang dibayar sebagai angka bulat rupiah tanpa titik/koma (number atau null), "date": tanggal transaksi format YYYY-MM-DD (string atau null), "category": salah satu dari ["Food","Social Life","Transportation","Household","Apparel","Beauty","Health","Education","Gift","Pet","Self-development","Electronics","Internet","Netflix","Subscription","House Rent","Listrik mami","Marriage Bill"], "type": "expense" atau "bill", "items": array nama barang (string[])}. Pilih category yang paling sesuai dengan jenis belanja. Gunakan null jika tidak yakin.';
+  const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent?key=' + encodeURIComponent(apiKey);
+  const body = { contents: [{ parts: [ { text: prompt }, { inline_data: { mime_type: mimeType, data: base64 } } ] }], generationConfig: { temperature: 0, responseMimeType: 'application/json' } };
+  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!res.ok) { let errMsg = 'HTTP ' + res.status; try { const ej = await res.json(); if (ej && ej.error && ej.error.message) errMsg = ej.error.message; } catch (_) {} throw new Error(errMsg); }
+  const data = await res.json();
+  const text = (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text) || '';
+  let obj; try { obj = JSON.parse(text); } catch (_) { const m = text.match(/\{[\s\S]*\}/); if (!m) throw new Error('Respons AI tidak bisa dibaca'); obj = JSON.parse(m[0]); }
+  return normalizeScanResult(obj);
+}
+function normalizeScanResult(obj) {
+  obj = obj || {};
+  let total = obj.total;
+  if (typeof total === 'string') total = parseFloat(total.replace(/[^\d.]/g, ''));
+  if (typeof total !== 'number' || isNaN(total)) total = null;
+  const date = (typeof obj.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(obj.date)) ? obj.date : null;
+  const type = obj.type === 'bill' ? 'bill' : 'expense';
+  return { merchant: (typeof obj.merchant === 'string' ? obj.merchant : '') || '', total, date, category: (typeof obj.category === 'string' ? obj.category : null), type, items: Array.isArray(obj.items) ? obj.items.filter(x => typeof x === 'string') : [] };
+}
+function renderScanResult(parsed) {
+  const resultEl = document.getElementById('scanResult');
+  resultEl.style.display = 'block';
+  const itemsStr = parsed.items && parsed.items.length ? parsed.items.join(', ') : '';
+  resultEl.innerHTML = '<div class="scan-result-row"><span>Toko:</span><span>' + escapeHtml(parsed.merchant || 'Tidak terdeteksi') + '</span></div>' +
+    '<div class="scan-result-row"><span>Total terdeteksi:</span><span class="fw-bold text-primary">' + (parsed.total !== null ? formatRupiah(parsed.total) : 'Tidak ditemukan') + '</span></div>' +
+    '<div class="scan-result-row"><span>Tanggal:</span><span>' + (parsed.date || 'Tidak ditemukan') + '</span></div>' +
+    (itemsStr ? '<div class="scan-result-row"><span>Item:</span><span style="font-size:var(--fs-xs);max-width:200px;text-align:right;color:var(--muted)">' + escapeHtml(itemsStr) + '</span></div>' : '');
+  document.getElementById('scanAmount').value = parsed.total || '';
+  document.getElementById('scanDesc').value = parsed.merchant || '';
+  if (parsed.date) { try { const pd = new Date(parsed.date); if (!isNaN(pd.getTime())) document.getElementById('scanDate').value = pd.toISOString().split('T')[0]; } catch (_) {} }
+  let guesses = [];
+  if (parsed.category) guesses.push(parsed.category + '|' + parsed.type);
+  guessCategory((parsed.merchant || '') + ' ' + (parsed.items || []).join(' ')).forEach(g => { if (!guesses.includes(g)) guesses.push(g); });
+  guesses = guesses.slice(0, 4);
+  const guessEl = document.getElementById('scanCategoryGuess');
+  if (guesses.length > 0) {
+    guessEl.innerHTML = guesses.map((g, i) => { const parts = g.split('|'); return '<div class="guess-pill ' + (i === 0 ? 'selected' : '') + '" data-cat="' + parts[0] + '" data-type="' + parts[1] + '">' + catIcon(parts[0]) + ' ' + parts[0] + '</div>'; }).join('');
+    scanSelectedCategory = guesses[0].split('|')[0]; scanSelectedType = guesses[0].split('|')[1];
+    const manualSelect = document.getElementById('scanCategoryManual'); if (manualSelect) { for (let i = 0; i < manualSelect.options.length; i++) { if (manualSelect.options[i].value === scanSelectedCategory + '|' + scanSelectedType) { manualSelect.selectedIndex = i; break; } } }
+    guessEl.querySelectorAll('.guess-pill').forEach(p => p.addEventListener('click', () => { guessEl.querySelectorAll('.guess-pill').forEach(x => x.classList.remove('selected')); p.classList.add('selected'); scanSelectedCategory = p.dataset.cat; scanSelectedType = p.dataset.type; const ms = document.getElementById('scanCategoryManual'); if (ms) { for (let i = 0; i < ms.options.length; i++) { if (ms.options[i].value === scanSelectedCategory + '|' + scanSelectedType) { ms.selectedIndex = i; break; } } } }));
+  } else { guessEl.innerHTML = '<div class="text-muted" style="font-size:var(--fs-sm)">Tidak ada tebakan kategori. Pilih manual di bawah.</div>'; }
+  document.getElementById('scanForm').style.display = 'block'; document.getElementById('saveScanBtn').disabled = false;
 }
 let ocrWorker = null, ocrWorkerPromise = null, ocrProgressCb = null;
 async function getOcrWorker() {
@@ -1557,8 +1702,13 @@ if ('serviceWorker' in navigator) {
 }
 
 /* ====== EVENT LISTENERS ====== */
+function openSidebar() { const s = document.getElementById('sidebar'); const o = document.getElementById('sidebarOverlay'); if (s) s.classList.add('open'); if (o) o.classList.add('open'); }
+function closeSidebar() { const s = document.getElementById('sidebar'); const o = document.getElementById('sidebarOverlay'); if (s) s.classList.remove('open'); if (o) o.classList.remove('open'); }
 function initEvents() {
   document.querySelectorAll('.tab').forEach(el => el.addEventListener('click', () => switchTab(el.dataset.tab)));
+  document.querySelectorAll('.nav-item').forEach(el => el.addEventListener('click', () => switchTab(el.dataset.tab)));
+  document.querySelectorAll('.nav-group-header').forEach(h => h.addEventListener('click', () => h.parentElement.classList.toggle('collapsed')));
+  { const mb = document.getElementById('menuBtn'); if (mb) mb.addEventListener('click', openSidebar); const sc = document.getElementById('sidebarClose'); if (sc) sc.addEventListener('click', closeSidebar); const ov = document.getElementById('sidebarOverlay'); if (ov) ov.addEventListener('click', closeSidebar); }
   document.querySelectorAll('.bottom-nav-item').forEach(el => el.addEventListener('click', () => switchTab(el.dataset.tab)));
   document.getElementById('prevMonth').addEventListener('click', prevMonth);
   document.getElementById('nextMonth').addEventListener('click', nextMonth);
