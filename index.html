@@ -803,8 +803,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
               <option value="Netflix|bill">Netflix</option>
               <option value="Subscription|bill">Subscription</option>
               <option value="House Rent|bill">House Rent</option>
-              <option value="Listrik mami|bill">Listrik mami</option>
-              <option value="Marriage Bill|bill">Marriage Bill</option>
+              <option value="Listrik|bill">Listrik</option>
             </optgroup>
           </select>
         </div>
@@ -840,8 +839,6 @@ const ICONS = {
   Dividends: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>',
   'Interest Income': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
   Commission: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>',
-  'Tunjangan Pernikahan': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>',
-  'Amplop Nikah': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><polyline points="2 7 12 13 22 7"/></svg>',
   Food: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>',
   'Social Life': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>',
   Transportation: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
@@ -858,8 +855,7 @@ const ICONS = {
   Netflix: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><polygon points="17 2 17 15 7 2 7 22 9 22 9 9 19 22 17 22 17 2"/></svg>',
   Subscription: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>',
   'House Rent': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
-  'Listrik mami': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
-  'Marriage Bill': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>',
+  'Listrik': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
   BCA: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
   'Travel Fund': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2A6 6 0 005 18a5.7 5.7 0 005.8 6 5.7 5.7 0 005.8-6L21 3l-4 1z"/></svg>',
   'Wedding Fund': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>',
@@ -871,9 +867,9 @@ const ICONS = {
 function catIcon(cat) { return ICONS[cat] || '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10h8M8 14h8"/></svg>'; }
 
 /* ====== CATEGORIES ====== */
-const INCOME_CATS = ['Paycheck','Business','Side Hustle','Dividends','Interest Income','Commission','Tunjangan Pernikahan','Amplop Nikah'];
+const INCOME_CATS = ['Paycheck','Business','Side Hustle','Dividends','Interest Income','Commission'];
 const EXPENSE_CATS = ['Food','Social Life','Transportation','Household','Apparel','Beauty','Health','Education','Gift','Pet','Self-development','Electronics'];
-const BILL_CATS = ['Internet','Netflix','Subscription','House Rent','Listrik mami','Marriage Bill'];
+const BILL_CATS = ['Internet','Netflix','Subscription','House Rent','Listrik'];
 const DEBT_CATS = ['BCA'];
 const SAVINGS_CATS = ['Travel Fund','Wedding Fund','Car Fund','Stocks','Mutual Funds','Cryptocurrency'];
 const ALL_CATS = { income: INCOME_CATS, expense: EXPENSE_CATS, bill: BILL_CATS, debt: DEBT_CATS, savings: SAVINGS_CATS };
@@ -893,8 +889,7 @@ const RECEIPT_KEYWORDS = {
   'Netflix|bill': ['netflix'],
   'Subscription|bill': ['spotify','youtube premium','disney','hotstar','vidio','apple music','google one','icloud','dropbox','canva','adobe'],
   'House Rent|bill': ['sewa','kos','kost','sewa rumah','rent','rumah sewa'],
-  'Listrik mami|bill': ['listrik','pln','token','pasca bayar'],
-  'Marriage Bill|bill': ['wedding','nikah','pernikahan','marriage','resepsi','undangan','catering','dekorasi','rias','photo','video','documentary'],
+  'Listrik|bill': ['listrik','pln','token','pasca bayar'],
   'Gift|expense': ['hadiah','gift','kado','present','oleh-oleh','cinderamata'],
   'Pet|expense': ['pet','anjing','kucing','cat','dog','kitten','puppy','makanan hewan','petshop','grooming'],
   'Self-development|expense': ['self','investment','personal growth','development','course online','udemy','coursera','skill'],
@@ -1159,7 +1154,7 @@ async function processScanAI(imageDataUrl, fileName) {
   }
 }
 async function callGeminiVision(apiKey, base64, mimeType) {
-  const prompt = 'Kamu adalah asisten pembaca struk belanja Indonesia. Baca gambar struk ini lalu kembalikan HANYA JSON valid tanpa teks lain dan tanpa markdown. Format: {"merchant": nama toko (string atau null), "total": total akhir yang dibayar sebagai angka bulat rupiah tanpa titik/koma (number atau null), "date": tanggal transaksi format YYYY-MM-DD (string atau null), "category": salah satu dari ["Food","Social Life","Transportation","Household","Apparel","Beauty","Health","Education","Gift","Pet","Self-development","Electronics","Internet","Netflix","Subscription","House Rent","Listrik mami","Marriage Bill"], "type": "expense" atau "bill", "items": array nama barang (string[])}. Pilih category yang paling sesuai dengan jenis belanja. Gunakan null jika tidak yakin.';
+  const prompt = 'Kamu adalah asisten pembaca struk belanja Indonesia. Baca gambar struk ini lalu kembalikan HANYA JSON valid tanpa teks lain dan tanpa markdown. Format: {"merchant": nama toko (string atau null), "total": total akhir yang dibayar sebagai angka bulat rupiah tanpa titik/koma (number atau null), "date": tanggal transaksi format YYYY-MM-DD (string atau null), "category": salah satu dari ["Food","Social Life","Transportation","Household","Apparel","Beauty","Health","Education","Gift","Pet","Self-development","Electronics","Internet","Netflix","Subscription","House Rent","Listrik"], "type": "expense" atau "bill", "items": array nama barang (string[])}. Pilih category yang paling sesuai dengan jenis belanja. Gunakan null jika tidak yakin.';
   const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent?key=' + encodeURIComponent(apiKey);
   const body = { contents: [{ parts: [ { text: prompt }, { inline_data: { mime_type: mimeType, data: base64 } } ] }], generationConfig: { temperature: 0, responseMimeType: 'application/json' } };
   const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
