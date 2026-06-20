@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta name="theme-color" content="#042f2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vaultin">
+<link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Vaultin%22,%22short_name%22:%22Vaultin%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23031c1b%22,%22theme_color%22:%22%23042f2e%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns%3D%27http://www.w3.org/2000/svg%27%20viewBox%3D%270%200%20192%20192%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%2310b981%27/%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%230d9488%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%27192%27%20height%3D%27192%27%20rx%3D%2744%27%20fill%3D%27url(%23g)%27/%3E%3Cpath%20d%3D%27M64%2060v72h64V60H64zm48%2060H80V72h32v48z%27%20fill%3D%27white%27%20opacity%3D%27.95%27/%3E%3C/svg%3E%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%20maskable%22}]}"/>
+<title>Vaultin — Pencatat Keuangan Pribadi</title>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.0/dist/tesseract.min.js"></script>
+<style>
+/* =============================
+   VAULTIN — DESIGN SYSTEM v2.0
+   Glassmorphism + Emerald/Teal
+   Dark-first, light adaptive
+   ============================= */
+
+:root {
+  /* Base palette — dark-first */
+  --bg-base: #031c1b;
+  --bg-mid: #052e2b;
+  --bg-elev: #073d39;
+  --surface: rgba(255,255,255,.06);
+  --surface-hover: rgba(255,255,255,.10);
+  --surface-solid: #0a4a45;
+  --surface-alt: rgba(255,255,255,.04);
+  --border: rgba(255,255,255,.10);
+  --border-strong: rgba(255,255,255,.18);
+
+  /* Text */
+  --fg: #e6f7f4;
+  --fg-secondary: #a7d4cd;
+  --muted: #6b9a93;
+  --muted-dim: #4a7a73;
+
+  /* Brand — emerald / teal gradient */
+  --emerald: #10b981;
+  --emerald-bright: #34d399;
+  --teal: #0d9488;
+  --teal-bright: #2dd4bf;
+  --brand-grad: linear-gradient(135deg, #10b981 0%, #0d9488 100%);
+  --brand-grad-bright: linear-gradient(135deg, #34d399 0%, #2dd4bf 100%);
+  --brand-glow: rgba(16,185,129,.35);
+
+  /* Semantic */
+  --success: #10b981;
+  --success-bg: rgba(16,185,129,.12);
+  --danger: #f43f5e;
+  --danger-bg: rgba(244,63,94,.12);
+  --warning: #f59e0b;
+  --warning-bg: rgba(245,158,11,.12);
+  --info: #0ea5e9;
+  --info-bg: rgba(14,165,233,.12);
+
+  /* Glass */
+  --glass-blur: 20px;
+  --glass-bg: rgba(255,255,255,.05);
+  --glass-border: rgba(255,255,255,.12);
+  --glass-shadow: 0 8px 32px rgba(0,0,0,.25);
+
+  /* Shadow — restrained 3-tier */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.15);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.20);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,.30);
+
+  /* Radius */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+  --r-full: 9999px;
+
+  /* Spacing — 4/8 grid */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+
+  /* Typography */
+  --fs-xs: 11px; --fs-sm: 13px; --fs-base: 15px; --fs-lg: 18px;
+  --fs-xl: 22px; --fs-2xl: 28px; --fs-3xl: 36px;
+  --font: -apple-system, BlinkMacSystemFont, 'Inter','Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SF Mono','Fira Code','Cascadia Code',monospace;
+  --lh-tight: 1.2;
+  --lh-base: 1.5;
+
+  /* Motion */
+  --dur-fast: 150ms; --dur-base: 220ms; --dur-slow: 350ms;
+  --ease-out: cubic-bezier(0.22,0.61,0.36,1);
+  --ease-spring: cubic-bezier(0.34,1.56,0.64,1);
+}
+
+[data-theme="light"] {
+  --bg-base: #f0fdfa;
+  --bg-mid: #ecfdf5;
+  --bg-elev: #ffffff;
+  --surface: rgba(0,0,0,.03);
+  --surface-hover: rgba(0,0,0,.06);
+  --surface-solid: #ffffff;
+  --surface-alt: rgba(0,0,0,.02);
+  --border: rgba(0,0,0,.08);
+  --border-strong: rgba(0,0,0,.15);
+  --fg: #042f2e;
+  --fg-secondary: #115e59;
+  --muted: #6b9a93;
+  --muted-dim: #94a3b8;
+  --glass-bg: rgba(255,255,255,.60);
+  --glass-border: rgba(255,255,255,.80);
+  --glass-shadow: 0 8px 32px rgba(13,148,136,.10);
+  --shadow-sm: 0 1px 3px rgba(13,148,136,.08);
+  --shadow-md: 0 4px 16px rgba(13,148,136,.10);
+  --shadow-lg: 0 12px 40px rgba(13,148,136,.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--font);
+  background: var(--bg-base);
+  color: var(--fg);
+  font-size: var(--fs-base);
+  line-height: var(--lh-base);
+  transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+  padding-bottom: env(safe-area-inset-bottom);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Ambient gradient background */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: -1;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 0%, rgba(16,185,129,.12), transparent 70%),
+    radial-gradient(ellipse 50% 60% at 80% 100%, rgba(13,148,136,.10), transparent 70%),
+    var(--bg-base);
+}
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; font-size: inherit; }
+input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--emerald-bright); outline-offset: 2px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+/* =============================
+   LAYOUT
+   ============================= */
+.app { max-width: 480px; margin: 0 auto; min-height: 100vh; }
+@media (min-width: 768px) { .app { max-width: 900px; } }
+@media (min-width: 1024px) { .app { max-width: 1100px; } }
+
+/* =============================
+   HEADER — Glass
+   ============================= */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-4) var(--sp-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--glass-border);
+}
+.brand { display: flex; align-items: center; gap: var(--sp-3); }
+.brand-logo {
+  width: 36px; height: 36px; border-radius: var(--r-md);
+  background: var(--brand-grad);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 12px var(--brand-glow);
+  flex-shrink: 0;
+}
+.brand-logo svg { width: 20px; height: 20px; }
+.brand-name { font-size: var(--fs-lg); font-weight: 700; letter-spacing: -.02em; }
+.brand-name span { background: var(--brand-grad-bright); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.header-actions { display: flex; gap: var(--sp-2); align-items: center; }
+
+/* =============================
+   ICON BUTTONS — Glass pill
+   ============================= */
+.icon-btn {
+  width: 38px; height: 38px; border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface); border: 1px solid var(--border);
+  transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast);
+  flex-shrink: 0;
+  color: var(--fg-secondary);
+}
+.icon-btn:hover { background: var(--surface-hover); border-color: var(--border-strong); color: var(--fg); }
+.icon-btn svg { width: 18px; height: 18px; }
+.icon-btn label { cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+
+/* =============================
+   MONTH NAV
+   ============================= */
+.month-nav {
+  display: flex; align-items: center; justify-content: center; gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surface-alt);
+  border-bottom: 1px solid var(--border);
+}
+.month-nav-btn {
+  width: 34px; height: 34px; border-radius: var(--r-sm);
+  background: var(--surface); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--fg-secondary);
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.month-nav-btn:hover { background: var(--surface-hover); color: var(--fg); border-color: var(--emerald); }
+.month-nav-btn svg { width: 16px; height: 16px; }
+.month-label { font-size: var(--fs-base); font-weight: 600; min-width: 130px; text-align: center; letter-spacing: -.01em; }
+
+/* =============================
+   TABS — Glass pill scroll
+   ============================= */
+.tabs {
+  display: flex; gap: var(--sp-2); overflow-x: auto;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surface-alt);
+  border-bottom: 1px solid var(--border);
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: var(--sp-2) var(--sp-4); border-radius: var(--r-full);
+  font-size: var(--fs-sm); font-weight: 600; white-space: nowrap;
+  color: var(--muted); background: var(--surface); border: 1px solid var(--border);
+  transition: all var(--dur-fast) var(--ease-out);
+  display: flex; align-items: center; gap: var(--sp-2);
+}
+.tab:hover { color: var(--fg); background: var(--surface-hover); }
+.tab.active {
+  background: var(--brand-grad); color: white; border-color: transparent;
+  box-shadow: 0 2px 12px var(--brand-glow);
+}
+.tab svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+/* =============================
+   MAIN
+   ============================= */
+.main { padding: var(--sp-4); display: flex; flex-direction: column; gap: var(--sp-4); }
+@media (min-width: 768px) { .main { padding: var(--sp-6); gap: var(--sp-5); } }
+
+/* =============================
+   CARD — Glass surface
+   ============================= */
+.card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--r-lg); border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
+  transition: border-color var(--dur-fast);
+}
+.card:hover { border-color: var(--border-strong); }
+.card-header { padding: var(--sp-4) var(--sp-4) var(--sp-2); display: flex; align-items: center; justify-content: space-between; }
+.card-title { font-size: var(--fs-xs); font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.card-body { padding: var(--sp-2) var(--sp-4) var(--sp-4); }
+
+/* =============================
+   GRADIENT HERO CARD — Dashboard
+   ============================= */
+.hero-card {
+  position: relative;
+  border-radius: var(--r-xl);
+  padding: var(--sp-6);
+  background: var(--brand-grad);
+  box-shadow: 0 12px 40px var(--brand-glow);
+  overflow: hidden;
+  color: white;
+}
+.hero-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 120% at 70% -20%, rgba(255,255,255,.15), transparent 60%);
+}
+.hero-card > * { position: relative; z-index: 1; }
+.hero-label { font-size: var(--fs-sm); opacity: .8; font-weight: 500; margin-bottom: var(--sp-1); }
+.hero-value { font-size: var(--fs-3xl); font-weight: 700; letter-spacing: -.02em; line-height: var(--lh-tight); }
+.hero-sub { display: flex; gap: var(--sp-4); margin-top: var(--sp-4); }
+.hero-sub-item { flex: 1; }
+.hero-sub-label { font-size: var(--fs-xs); opacity: .7; text-transform: uppercase; letter-spacing: .04em; }
+.hero-sub-value { font-size: var(--fs-base); font-weight: 600; margin-top: var(--sp-1); }
+
+/* =============================
+   CASHFLOW GRID
+   ============================= */
+.cashflow-grid { display: grid; gap: var(--sp-2); }
+.cashflow-row { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-3) var(--sp-4); border-radius: var(--r-md); }
+.cashflow-row.plus { background: var(--success-bg); }
+.cashflow-row.minus { background: rgba(244,63,94,.08); }
+.cashflow-row.total { background: var(--surface-hover); font-weight: 700; border: 1px solid var(--border-strong); }
+.cashflow-left { display: flex; align-items: center; gap: var(--sp-3); }
+.cashflow-left svg { width: 18px; height: 18px; }
+.cashflow-sign { width: 20px; text-align: center; font-weight: 700; }
+.cashflow-label { font-size: var(--fs-base); }
+.cashflow-right { font-size: var(--fs-lg); font-weight: 700; font-variant-numeric: tabular-nums; }
+.cashflow-right.positive { color: var(--success); }
+.cashflow-right.negative { color: var(--danger); }
+
+.on-track-badge { display: inline-flex; align-items: center; gap: var(--sp-1); padding: var(--sp-1) var(--sp-3); border-radius: var(--r-full); font-size: var(--fs-xs); font-weight: 600; }
+.on-track-badge.on { background: var(--success-bg); color: var(--success); }
+.on-track-badge.over { background: var(--danger-bg); color: var(--danger); }
+
+/* =============================
+   SUMMARY TABLE
+   ============================= */
+.summary-table { width: 100%; border-collapse: collapse; }
+.summary-table th { text-align: left; font-size: var(--fs-xs); color: var(--muted); font-weight: 600; padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: .04em; }
+.summary-table td { padding: var(--sp-3); border-bottom: 1px solid var(--border); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+.summary-table tr:last-child td { border-bottom: none; }
+.summary-table tfoot td { font-weight: 700; border-top: 2px solid var(--border); background: var(--surface-alt); }
+
+/* =============================
+   PROGRESS BAR
+   ============================= */
+.progress-track { width: 100%; height: 6px; background: var(--surface); border-radius: var(--r-full); overflow: hidden; }
+.progress-fill { height: 100%; border-radius: var(--r-full); transition: width var(--dur-slow) var(--ease-out); }
+.progress-label-row { display: flex; justify-content: space-between; font-size: var(--fs-xs); color: var(--muted); margin-top: var(--sp-1); }
+.progress-mini { width: 60px; height: 5px; background: var(--surface); border-radius: 3px; overflow: hidden; }
+.progress-mini-fill { height: 100%; border-radius: 3px; transition: width .3s ease; }
+
+/* =============================
+   FORMS
+   ============================= */
+.form-group { margin-bottom: var(--sp-4); }
+.form-label { display: block; font-size: var(--fs-sm); font-weight: 600; color: var(--fg-secondary); margin-bottom: var(--sp-2); }
+.form-input, .form-select {
+  width: 100%; padding: var(--sp-3); border-radius: var(--r-md);
+  border: 1px solid var(--border); background: var(--surface); font-size: var(--fs-base);
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+  font-variant-numeric: tabular-nums;
+}
+.form-input:focus, .form-select:focus { border-color: var(--emerald); outline: none; box-shadow: 0 0 0 3px var(--success-bg); }
+.form-input::placeholder { color: var(--muted-dim); }
+.form-row { display: flex; gap: var(--sp-3); }
+.form-row > .form-group { flex: 1; }
+
+/* =============================
+   BUTTONS
+   ============================= */
+.btn {
+  padding: var(--sp-3) var(--sp-6); border-radius: var(--r-md); font-weight: 600; font-size: var(--fs-base);
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  transition: all var(--dur-fast) var(--ease-out);
+  border: 1px solid transparent;
+}
+.btn svg { width: 16px; height: 16px; }
+.btn-primary { background: var(--brand-grad); color: white; border: none; 
+  box-shadow: 0 2px 12px var(--brand-glow); }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-primary:active { transform: scale(.98); }
+.btn-secondary { background: var(--surface); color: var(--fg); border-color: var(--border); }
+.btn-secondary:hover { background: var(--surface-hover); border-color: var(--border-strong); }
+.btn-danger { background: var(--danger-bg); color: var(--danger); border-color: rgba(244,63,94,.25); }
+.btn-sm { padding: var(--sp-2) var(--sp-3); font-size: var(--fs-sm); }
+.btn:disabled { opacity: .35; cursor: not-allowed; }
+
+/* =============================
+   MODAL — Glass bottom sheet
+   ============================= */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.50); z-index: 200;
+  display: none; align-items: flex-end; justify-content: center;
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+}
+@media (min-width: 768px) { .modal-overlay { align-items: center; } }
+.modal-overlay.active { display: flex; }
+.modal {
+  background: var(--bg-elev); border-radius: var(--r-xl) var(--r-xl) 0 0;
+  width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  animation: slideUp var(--dur-base) var(--ease-spring);
+  border: 1px solid var(--glass-border); border-bottom: none;
+}
+@media (min-width: 768px) { .modal { border-radius: var(--r-xl); border: 1px solid var(--glass-border); } }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-header { padding: var(--sp-4); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg-elev); z-index: 1; }
+.modal-title { font-size: var(--fs-lg); font-weight: 700; letter-spacing: -.01em; }
+.modal-body { padding: var(--sp-4); }
+.modal-footer { padding: var(--sp-4); display: flex; gap: var(--sp-3); border-top: 1px solid var(--border); position: sticky; bottom: 0; background: var(--bg-elev); }
+
+/* =============================
+   BOTTOM NAV
+   ============================= */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
+  background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-top: 1px solid var(--glass-border);
+  display: flex; justify-content: space-around;
+  padding: var(--sp-2) 0 calc(var(--sp-2) + env(safe-area-inset-bottom));
+}
+.bottom-nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: var(--sp-1) var(--sp-2); font-size: var(--fs-xs); color: var(--muted); font-weight: 600;
+  border-radius: var(--r-sm); transition: color var(--dur-fast); min-width: 60px;
+}
+.bottom-nav-item.active { color: var(--emerald-bright); }
+.bottom-nav-item svg { width: 20px; height: 20px; }
+@media (min-width: 768px) { .bottom-nav { display: none; } }
+@media (max-width: 767px) { .main { padding-bottom: 80px; } }
+
+/* =============================
+   CHART
+   ============================= */
+.chart-canvas-wrap { padding: var(--sp-2) var(--sp-2) var(--sp-4); position: relative; }
+.chart-canvas { width: 100%; height: 200px; }
+@media (min-width: 768px) { .chart-canvas { height: 280px; } }
+
+/* =============================
+   TRANSACTION LIST
+   ============================= */
+.txn-list { display: flex; flex-direction: column; gap: var(--sp-2); }
+.txn-item {
+  display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3);
+  border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--border);
+  transition: background var(--dur-fast), border-color var(--dur-fast);
+  cursor: pointer;
+}
+.txn-item:hover { background: var(--surface-hover); border-color: var(--border-strong); }
+.txn-item-icon {
+  width: 40px; height: 40px; border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  background: var(--surface-hover);
+}
+.txn-item-icon svg { width: 20px; height: 20px; }
+.txn-item-body { flex: 1; min-width: 0; }
+.txn-item-name { font-size: var(--fs-base); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.txn-item-meta { font-size: var(--fs-xs); color: var(--muted); display: flex; gap: var(--sp-2); flex-wrap: wrap; align-items: center; }
+.txn-item-meta svg { width: 11px; height: 11px; }
+.txn-item-amount { font-size: var(--fs-base); font-weight: 700; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.txn-item-amount.expense { color: var(--danger); }
+.txn-item-amount.income { color: var(--success); }
+
+/* =============================
+   SAVINGS GOAL
+   ============================= */
+.savings-item { padding: var(--sp-3) var(--sp-4); border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--border); margin-bottom: var(--sp-3); }
+.savings-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-2); }
+.savings-name { font-size: var(--fs-base); font-weight: 600; display: flex; align-items: center; gap: var(--sp-2); }
+.savings-name svg { width: 16px; height: 16px; }
+.savings-pct { font-size: var(--fs-sm); font-weight: 700; color: var(--emerald-bright); font-variant-numeric: tabular-nums; }
+.savings-input-row { display: flex; gap: var(--sp-2); margin-top: var(--sp-3); }
+.savings-input-row input { flex: 1; }
+
+/* =============================
+   EMPTY STATE
+   ============================= */
+.empty-state { text-align: center; padding: var(--sp-8) var(--sp-4); color: var(--muted); }
+.empty-state svg { width: 48px; height: 48px; margin: 0 auto var(--sp-3); opacity: .5; }
+.empty-state-text { font-size: var(--fs-base); }
+
+/* =============================
+   FAB
+   ============================= */
+.fab {
+  position: fixed; bottom: 70px; right: var(--sp-4); width: 54px; height: 54px;
+  border-radius: var(--r-full); background: var(--brand-grad); color: white;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 24px var(--brand-glow); z-index: 80;
+  transition: transform var(--dur-fast); border: 1px solid rgba(255,255,255,.15);
+}
+@media (min-width: 768px) { .fab { bottom: var(--sp-6); right: var(--sp-6); } }
+.fab:active { transform: scale(.92); }
+.fab svg { width: 24px; height: 24px; }
+.fab-scan {
+  position: fixed; bottom: 70px; right: calc(var(--sp-4) + 62px); width: 54px; height: 54px;
+  border-radius: var(--r-full); background: var(--surface-solid); color: var(--emerald-bright);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-lg); z-index: 80;
+  transition: transform var(--dur-fast); border: 1px solid var(--border);
+}
+@media (min-width: 768px) { .fab-scan { bottom: var(--sp-6); right: calc(var(--sp-6) + 62px); } }
+.fab-scan:active { transform: scale(.92); }
+.fab-scan svg { width: 22px; height: 22px; }
+
+/* =============================
+   UTILITY
+   ============================= */
+.hidden { display: none !important; }
+.text-success { color: var(--success); }
+.text-danger { color: var(--danger); }
+.text-muted { color: var(--muted); }
+.text-primary { color: var(--emerald-bright); }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.fw-bold { font-weight: 700; }
+.gap-2 { gap: var(--sp-2); } .gap-3 { gap: var(--sp-3); }
+.flex { display: flex; } .flex-col { flex-direction: column; }
+.items-center { align-items: center; } .justify-between { justify-content: space-between; }
+.flex-wrap { flex-wrap: wrap; }
+.mt-2 { margin-top: var(--sp-2); } .mt-4 { margin-top: var(--sp-4); }
+.mb-4 { margin-bottom: var(--sp-4); }
+.category-badge { display: inline-block; padding: 2px 10px; border-radius: var(--r-full); font-size: var(--fs-xs); font-weight: 600; background: var(--surface-hover); color: var(--fg-secondary); border: 1px solid var(--border); }
+.section-title { font-size: var(--fs-base); font-weight: 700; margin: var(--sp-6) 0 var(--sp-3); padding-bottom: var(--sp-2); border-bottom: 1px solid var(--border); }
+
+/* =============================
+   SCAN UI
+   ============================= */
+.scan-preview { width: 100%; border-radius: var(--r-md); border: 2px dashed var(--border-strong); padding: var(--sp-8); text-align: center; color: var(--muted); cursor: pointer; transition: border-color var(--dur-fast); }
+.scan-preview:hover { border-color: var(--emerald); }
+.scan-preview.has-image { padding: 0; border-style: solid; }
+.scan-preview img { width: 100%; border-radius: var(--r-md); display: block; }
+.scan-preview svg { width: 40px; height: 40px; margin: 0 auto var(--sp-3); opacity: .5; }
+.scan-status { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); border-radius: var(--r-md); background: var(--success-bg); margin: var(--sp-3) 0; }
+.scan-status .spinner { width: 20px; height: 20px; border: 3px solid var(--surface-hover); border-top-color: var(--emerald-bright); border-radius: 50%; animation: spin .6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.scan-result { padding: var(--sp-4); border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--border); margin: var(--sp-3) 0; }
+.scan-result-row { display: flex; justify-content: space-between; padding: var(--sp-2) 0; border-bottom: 1px solid var(--border); font-size: var(--fs-sm); }
+.scan-result-row:last-child { border-bottom: none; font-weight: 700; }
+.guess-pills { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-3); }
+.guess-pill { padding: var(--sp-2) var(--sp-3); border-radius: var(--r-full); font-size: var(--fs-sm); font-weight: 600; background: var(--surface); border: 2px solid var(--border); cursor: pointer; transition: all var(--dur-fast); display: flex; align-items: center; gap: var(--sp-2); color: var(--fg-secondary); }
+.guess-pill:hover { border-color: var(--emerald); color: var(--fg); }
+.guess-pill.selected { background: var(--brand-grad); color: white; border-color: transparent; }
+.guess-pill svg { width: 14px; height: 14px; }
+
+.vt-toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(12px);background:var(--surface-solid);color:var(--fg);padding:var(--sp-3) var(--sp-4);border-radius:var(--r-md);box-shadow:var(--shadow-lg);border:1px solid var(--border);font-size:var(--fs-sm);max-width:90%;text-align:center;opacity:0;pointer-events:none;transition:opacity var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out);z-index:1000}
+.vt-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.vt-toast.error{border-color:var(--danger);color:var(--danger)}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 7v10M16 7v10M8 12h8"/></svg>
+      </div>
+      <div class="brand-name">Vault<span>in</span></div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+      <button class="icon-btn" id="exportBtn" aria-label="Export data">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      </button>
+      <button class="icon-btn" aria-label="Import data">
+        <label for="importFile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        </label>
+      </button>
+      <input type="file" id="importFile" accept=".json,.csv" style="display:none">
+    </div>
+  </header>
+
+  <!-- MONTH NAV -->
+  <div class="month-nav">
+    <button class="month-nav-btn" id="prevMonth" aria-label="Bulan sebelumnya">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="month-label" id="monthLabel">—</div>
+    <button class="month-nav-btn" id="nextMonth" aria-label="Bulan berikutnya">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+
+  <!-- TABS -->
+  <nav class="tabs" id="tabBar">
+    <button class="tab active" data-tab="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Dashboard</button>
+    <button class="tab" data-tab="income"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Income</button>
+    <button class="tab" data-tab="expense"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>Expense</button>
+    <button class="tab" data-tab="bills"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 12 7 14 9"/></svg>Bills</button>
+    <button class="tab" data-tab="debt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Debt</button>
+    <button class="tab" data-tab="savings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21V12h6v9"/></svg>Savings</button>
+    <button class="tab" data-tab="ytd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>YTD</button>
+    <button class="tab" data-tab="asset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Aset</button>
+    <button class="tab" data-tab="tax"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>Pajak</button>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="main" id="main">
+    <div id="tab-dashboard" class="tab-content"></div>
+    <div id="tab-income" class="tab-content hidden"></div>
+    <div id="tab-expense" class="tab-content hidden"></div>
+    <div id="tab-bills" class="tab-content hidden"></div>
+    <div id="tab-debt" class="tab-content hidden"></div>
+    <div id="tab-savings" class="tab-content hidden"></div>
+    <div id="tab-ytd" class="tab-content hidden"></div>
+    <div id="tab-asset" class="tab-content hidden"></div>
+    <div id="tab-tax" class="tab-content hidden"></div>
+  </main>
+
+  <!-- FAB -->
+  <button class="fab-scan" id="fabScan" aria-label="Scan struk">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+  </button>
+  <button class="fab" id="fabAdd" aria-label="Tambah transaksi">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="bottom-nav-item active" data-tab="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Dashboard</button>
+    <button class="bottom-nav-item" data-tab="income"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Income</button>
+    <button class="bottom-nav-item" data-tab="expense"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>Expense</button>
+    <button class="bottom-nav-item" data-tab="savings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21V12h6v9"/></svg>Savings</button>
+    <button class="bottom-nav-item" data-tab="ytd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>YTD</button>
+  </nav>
+</div>
+
+<!-- TRANSACTION MODAL -->
+<div class="modal-overlay" id="txnModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="txnModalTitle">Tambah Transaksi</div>
+      <button class="icon-btn" id="closeTxnModal" aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Jenis Transaksi</label>
+        <div class="flex gap-2">
+          <button class="btn btn-sm btn-secondary" data-txn-type="expense" id="typeExpense" style="flex:1">Expense</button>
+          <button class="btn btn-sm btn-secondary" data-txn-type="income" id="typeIncome" style="flex:1">Income</button>
+          <button class="btn btn-sm btn-secondary" data-txn-type="bill" id="typeBill" style="flex:1">Bill</button>
+          <button class="btn btn-sm btn-secondary" data-txn-type="debt" id="typeDebt" style="flex:1">Debt</button>
+          <button class="btn btn-sm btn-secondary" data-txn-type="savings" id="typeSavings" style="flex:1">Savings</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kategori</label>
+        <select class="form-select" id="txnCategory"></select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Jumlah (Rp)</label>
+          <input type="number" class="form-input" id="txnAmount" placeholder="0" min="0" step="1000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tanggal</label>
+          <input type="date" class="form-input" id="txnDate">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Deskripsi</label>
+        <input type="text" class="form-input" id="txnDesc" placeholder="Opsional">
+      </div>
+      <input type="hidden" id="txnId">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="deleteTxnBtn" style="display:none">Hapus</button>
+      <button class="btn btn-secondary" id="cancelTxnBtn">Batal</button>
+      <button class="btn btn-primary" id="saveTxnBtn" style="flex:1">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- BUDGET MODAL -->
+<div class="modal-overlay" id="budgetModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Set Budget Expected</div>
+      <button class="icon-btn" id="closeBudgetModal" aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body" id="budgetModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancelBudgetBtn">Batal</button>
+      <button class="btn btn-primary" id="saveBudgetBtn" style="flex:1">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ASSET MODAL -->
+<div class="modal-overlay" id="assetModal" onclick="if(event.target.id==='assetModal')closeAssetModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="assetModalTitle">Tambah Aset</div>
+      <button class="icon-btn" onclick="closeAssetModal()" aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Jenis Aset</label><select class="form-select" id="assetType" onchange="onAssetTypeChange()"></select></div>
+      <div class="form-group"><label class="form-label">Nama Aset</label><input type="text" class="form-input" id="assetName" placeholder="cth: Rumah Bekasi, Emas Antam, Bitcoin"></div>
+      <div class="form-group" id="assetSymbolGroup" style="display:none"><label class="form-label">Pilih Koin (CoinGecko)</label><select class="form-select" id="assetCryptoSelect" onchange="onCryptoSelect()"></select><input type="text" class="form-input mt-2" id="assetSymbol" placeholder="ID CoinGecko, cth: bitcoin" style="display:none"></div>
+      <div class="form-group" id="assetQtyGroup"><label class="form-label" id="assetQtyLabel">Jumlah Unit</label><input type="number" class="form-input" id="assetQty" placeholder="0" min="0" step="any"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label" id="assetBuyPriceLabel">Harga Beli / Unit (Rp)</label><input type="number" class="form-input" id="assetBuyPrice" placeholder="0" min="0" step="1000"></div>
+        <div class="form-group"><label class="form-label" id="assetCurPriceLabel">Harga Sekarang / Unit (Rp)</label><input type="number" class="form-input" id="assetCurPrice" placeholder="0" min="0" step="1000"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Tanggal Perolehan</label><input type="date" class="form-input" id="assetBuyDate"></div>
+      <div class="form-group" id="assetLiveGroup" style="display:none"><label style="display:flex;align-items:center;gap:var(--sp-2);cursor:pointer;font-size:var(--fs-sm);color:var(--fg-secondary)"><input type="checkbox" id="assetLive" checked style="width:18px;height:18px;accent-color:var(--emerald)"> Update harga otomatis (live)</label><div class="text-muted" style="font-size:var(--fs-xs);margin-top:var(--sp-1)" id="assetLiveHint"></div></div>
+      <div class="form-group"><label class="form-label">Catatan</label><input type="text" class="form-input" id="assetNotes" placeholder="Opsional"></div>
+      <input type="hidden" id="assetId">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="deleteAssetBtn" style="display:none" onclick="deleteAsset()">Hapus</button>
+      <button class="btn btn-secondary" onclick="closeAssetModal()">Batal</button>
+      <button class="btn btn-primary" id="saveAssetBtn" style="flex:1" onclick="saveAsset()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCAN MODAL -->
+<div class="modal-overlay" id="scanModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Scan Struk Belanja</div>
+      <button class="icon-btn" id="closeScanModal" aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="scan-preview" id="scanPreview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+        <div style="font-size:var(--fs-base);font-weight:600;margin-top:var(--sp-2)">Ketuk untuk upload foto struk</div>
+        <div style="font-size:var(--fs-sm);color:var(--muted);margin-top:var(--sp-2)">Atau screenshot struk belanja kamu</div>
+        <input type="file" id="scanFileInput" accept="image/*" style="display:none">
+      </div>
+      <div id="scanStatus" style="display:none"></div>
+      <div id="scanResult" style="display:none"></div>
+      <div id="scanForm" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Kategori Tebakan AI</label>
+          <div class="guess-pills" id="scanCategoryGuess"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Atau pilih kategori manual</label>
+          <select class="form-select" id="scanCategoryManual">
+            <optgroup label="Expense">
+              <option value="Food|expense">Food</option>
+              <option value="Social Life|expense">Social Life</option>
+              <option value="Transportation|expense">Transportation</option>
+              <option value="Household|expense">Household</option>
+              <option value="Apparel|expense">Apparel</option>
+              <option value="Beauty|expense">Beauty</option>
+              <option value="Health|expense">Health</option>
+              <option value="Education|expense">Education</option>
+              <option value="Gift|expense">Gift</option>
+              <option value="Pet|expense">Pet</option>
+              <option value="Self-development|expense">Self-development</option>
+              <option value="Electronics|expense">Electronics</option>
+            </optgroup>
+            <optgroup label="Bill">
+              <option value="Internet|bill">Internet</option>
+              <option value="Netflix|bill">Netflix</option>
+              <option value="Subscription|bill">Subscription</option>
+              <option value="House Rent|bill">House Rent</option>
+              <option value="Listrik mami|bill">Listrik mami</option>
+              <option value="Marriage Bill|bill">Marriage Bill</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Total (Rp)</label>
+            <input type="number" class="form-input" id="scanAmount" placeholder="0" min="0" step="1000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tanggal</label>
+            <input type="date" class="form-input" id="scanDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nama Toko / Deskripsi</label>
+          <input type="text" class="form-input" id="scanDesc" placeholder="Opsional">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" id="scanFooter">
+      <button class="btn btn-secondary" id="cancelScanBtn">Batal</button>
+      <button class="btn btn-primary" id="saveScanBtn" style="flex:1" disabled>Simpan Transaksi</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ====== SVG ICON SYSTEM ====== */
+const ICONS = {
+  Paycheck: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
+  Business: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg>',
+  'Side Hustle': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000-1.4l-3-3a1 1 0 00-1.4 0l-1.6 1.6a1 1 0 010 1.4l3 3a1 1 0 001.4 0z"/><path d="M3 21l9-9M9 3l3 3"/></svg>',
+  Dividends: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>',
+  'Interest Income': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  Commission: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>',
+  'Tunjangan Pernikahan': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>',
+  'Amplop Nikah': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><polyline points="2 7 12 13 22 7"/></svg>',
+  Food: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>',
+  'Social Life': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>',
+  Transportation: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+  Household: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  Apparel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.49l1.32 4.51a2 2 0 002 1.49h.95v9a2 2 0 002 2h6.9a2 2 0 002-2v-9h.95a2 2 0 002-1.49l1.32-4.51a2 2 0 00-1.34-2.49z"/></svg>',
+  Beauty: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v6a4 4 0 004 4v10M6 2h6M6 2v6M18 2v20M14 2v8a2 2 0 002 2h2a2 2 0 002-2V2"/></svg>',
+  Health: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 1.5C10.5 3.5 9.26 3 7.5 3A5.5 5.5 0 002 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"/></svg>',
+  Education: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7l10-4 10 4-10 4z"/><path d="M6 9v5a6 3 0 0012 0V9"/></svg>',
+  Gift: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>',
+  Pet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="4" cy="8" r="2"/><circle cx="7.5" cy="14" r="2"/><circle cx="14.5" cy="14" r="2"/><path d="M8 20h8a4 4 0 00-8 0z"/></svg>',
+  'Self-development': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4 4 4 0 014-4h6v18h-6a4 4 0 00-4 4 4 4 0 00-4-4H2z"/></svg>',
+  Electronics: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+  Internet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>',
+  Netflix: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><polygon points="17 2 17 15 7 2 7 22 9 22 9 9 19 22 17 22 17 2"/></svg>',
+  Subscription: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>',
+  'House Rent': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  'Listrik mami': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+  'Marriage Bill': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>',
+  BCA: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+  'Travel Fund': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2A6 6 0 005 18a5.7 5.7 0 005.8 6 5.7 5.7 0 005.8-6L21 3l-4 1z"/></svg>',
+  'Wedding Fund': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>',
+  'Car Fund': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+  Stocks: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>',
+  'Mutual Funds': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>',
+  Cryptocurrency: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 8h5a2.5 2.5 0 010 5H9zM9 11h5.5a2.5 2.5 0 010 5H9zM11 6v2M11 18v2M13 6v2M13 18v2"/></svg>',
+};
+function catIcon(cat) { return ICONS[cat] || '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10h8M8 14h8"/></svg>'; }
+
+/* ====== CATEGORIES ====== */
+const INCOME_CATS = ['Paycheck','Business','Side Hustle','Dividends','Interest Income','Commission','Tunjangan Pernikahan','Amplop Nikah'];
+const EXPENSE_CATS = ['Food','Social Life','Transportation','Household','Apparel','Beauty','Health','Education','Gift','Pet','Self-development','Electronics'];
+const BILL_CATS = ['Internet','Netflix','Subscription','House Rent','Listrik mami','Marriage Bill'];
+const DEBT_CATS = ['BCA'];
+const SAVINGS_CATS = ['Travel Fund','Wedding Fund','Car Fund','Stocks','Mutual Funds','Cryptocurrency'];
+const ALL_CATS = { income: INCOME_CATS, expense: EXPENSE_CATS, bill: BILL_CATS, debt: DEBT_CATS, savings: SAVINGS_CATS };
+const CAT_COLORS = ['#10b981','#2dd4bf','#0d9488','#14b8a6','#34d399','#6ee7b7','#99f6e4','#5eead4','#22d3ee','#0891b2','#06b6d4','#0ea5e9','#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899','#f43f5e','#f59e0b','#eab308','#84cc16'];
+
+/* ====== KEYWORDS FOR AUTO-CATEGORIZE ====== */
+const RECEIPT_KEYWORDS = {
+  'Food|expense': ['indomaret','alfamidi','alfamart','superindo','supermarket','grocery','fresh','kelapa','sayur','buah','daging','ikan','ayam','roti','toko','warung','restoran','resto','cafe','coffee','mcdonald','kfc','pizza','burger','nasi','mie','bakso','sate','warteg','pecel','ayam geprek','es teh','minuman','snack','cemilan','permen','coklat','susilo','family mart','seven eleven','circle k','farm fresh','tokoobat','apotek'],
+  'Household|expense': ['sembako','sabun','shampo','sampo','pasta gigi','tissue','tisu','detergen','pewangi','pembersih','kitchen','kulkas','rumah','dekor','home','cleaning','kosmetik','perawatan','toiletries'],
+  'Transportation|expense': ['gojek','grab','maxim','uber','transport','bbm','bensin','pertamina','shell','parkir','tol','tiket','krl','busway','transjakarta','mrt','lrt','ojek','taxi','taksi','angkot'],
+  'Beauty|expense': ['skincare','cosmetic','makeup','foundation','lipstick','parfum','perfume','salon','creams','lotion','masker','mask','beauty','parsel','perawatan kulit','sunsilk','wardah','maybelline','ponds','garnier'],
+  'Health|expense': ['apotik','apotek','klinik','rumah sakit','dokter','obat','vitamin','suplemen','farmasi','pharmacy','k24','generik'],
+  'Apparel|expense': ['baju','celana','sepatu','jaket','kaos','gamis','hijab','kerudung','sandal','tas','dompet','fashion','pakaian','butik','distro','uniql'],
+  'Education|expense': ['buku','seminar','kursus','pelatihan','webinar','workshop','training','sekolah','kampus','universitas','akademi','les'],
+  'Social Life|expense': ['kafe','bar','karaoke','bioskop','cinema','tiket','konser','party','nongkrong','hangout','club','pub','billiard'],
+  'Internet|bill': ['indihome','telkomsel','xl','tri','axis','smartfren','byu','internux','wifi','internet','isp','provider'],
+  'Netflix|bill': ['netflix'],
+  'Subscription|bill': ['spotify','youtube premium','disney','hotstar','vidio','apple music','google one','icloud','dropbox','canva','adobe'],
+  'House Rent|bill': ['sewa','kos','kost','sewa rumah','rent','rumah sewa'],
+  'Listrik mami|bill': ['listrik','pln','token','pasca bayar'],
+  'Marriage Bill|bill': ['wedding','nikah','pernikahan','marriage','resepsi','undangan','catering','dekorasi','rias','photo','video','documentary'],
+  'Gift|expense': ['hadiah','gift','kado','present','oleh-oleh','cinderamata'],
+  'Pet|expense': ['pet','anjing','kucing','cat','dog','kitten','puppy','makanan hewan','petshop','grooming'],
+  'Self-development|expense': ['self','investment','personal growth','development','course online','udemy','coursera','skill'],
+  'Electronics|expense': ['samsung','apple','oppo','vivo','xiaomi','motorola','nokia','laptop','laptops','notebook','notebooks','acer','asus','dell','hp ','lenovo','msi','gaming','console','playstation','xbox','nintendo','gadget','electronic','monitor','keyboard','mouse','charger','kabel','hardisk','ssd','flashdisk'],
+};
+
+/* ====== STATE ====== */
+let db = null;
+let currentTab = 'dashboard';
+let currentDate = new Date();
+let currentMonth = currentDate.getMonth();
+let currentYear = currentDate.getFullYear();
+let editingTxnId = null;
+let selectedTxnType = 'expense';
+let budgetCache = null;
+let scanSelectedCategory = null;
+let scanSelectedType = 'expense';
+const MONTH_NAMES = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const MONTH_SHORT = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+/* ====== INDEXEDDB ====== */
+function openDB() { return new Promise((resolve, reject) => { const req = indexedDB.open('VaultinDB', 2); req.onupgradeneeded = (e) => { const d = e.target.result; if (!d.objectStoreNames.contains('transactions')) { const s = d.createObjectStore('transactions', { keyPath: 'id', autoIncrement: true }); s.createIndex('byMonth', 'monthKey', { unique: false }); s.createIndex('byCategory', 'category', { unique: false }); s.createIndex('byType', 'type', { unique: false }); } if (!d.objectStoreNames.contains('budgets')) { d.createObjectStore('budgets', { keyPath: 'monthKey' }); } if (!d.objectStoreNames.contains('savingsGoals')) { d.createObjectStore('savingsGoals', { keyPath: 'id', autoIncrement: true }); } if (!d.objectStoreNames.contains('settings')) { d.createObjectStore('settings', { keyPath: 'key' }); } if (!d.objectStoreNames.contains('assets')) { d.createObjectStore('assets', { keyPath: 'id', autoIncrement: true }); } }; req.onsuccess = (e) => { db = e.target.result; resolve(db); }; req.onerror = (e) => reject(e.target.error); }); }
+function dbGet(store, key) { return new Promise((resolve, reject) => { const tx = db.transaction(store, 'readonly'); const req = tx.objectStore(store).get(key); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); }); }
+function dbGetAll(store) { return new Promise((resolve, reject) => { const tx = db.transaction(store, 'readonly'); const req = tx.objectStore(store).getAll(); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); }); }
+function dbPut(store, val) { return new Promise((resolve, reject) => { const tx = db.transaction(store, 'readwrite'); tx.objectStore(store).put(val); tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error); }); }
+function dbAdd(store, val) { return new Promise((resolve, reject) => { const tx = db.transaction(store, 'readwrite'); const req = tx.objectStore(store).add(val); req.onsuccess = () => resolve(req.result); tx.onerror = () => reject(tx.error); }); }
+function dbDelete(store, key) { return new Promise((resolve, reject) => { const tx = db.transaction(store, 'readwrite'); tx.objectStore(store).delete(key); tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error); }); }
+function dbGetByIndex(store, indexName, value) { return new Promise((resolve, reject) => { const tx = db.transaction(store, 'readonly'); const idx = tx.objectStore(store).index(indexName); const req = idx.getAll(value); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); }); }
+
+/* ====== UTILS ====== */
+function monthKey(y, m) { return y + '-' + String(m + 1).padStart(2, '0'); }
+function currentMonthKey() { return monthKey(currentYear, currentMonth); }
+function formatRupiah(n) { if (n === null || n === undefined || isNaN(n)) n = 0; return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
+function formatRupiahShort(n) { if (n >= 1e9) return 'Rp ' + (n/1e9).toFixed(1) + 'M'; if (n >= 1e6) return 'Rp ' + (n/1e6).toFixed(1) + 'jt'; if (n >= 1e3) return 'Rp ' + (n/1e3).toFixed(0) + 'rb'; return formatRupiah(n); }
+function parseNumber(val) { let n = parseFloat(val); return isNaN(n) ? 0 : n; }
+function escapeHtml(s) { if (!s) return ''; return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+function colorForIndex(i) { return CAT_COLORS[i % CAT_COLORS.length]; }
+function saveSetting(key, value) { dbPut('settings', { key, value }).catch(()=>{}); }
+async function getSetting(key) { try { const r = await dbGet('settings', key); return r ? r.value : null; } catch { return null; } }
+function typeLabel(type) { return { income:'Income', expense:'Expense', bill:'Bill', debt:'Debt', savings:'Savings' }[type] || type; }
+
+/* ====== DATA FUNCTIONS ====== */
+async function getTransactions(monthK) { return dbGetByIndex('transactions', 'byMonth', monthK); }
+async function getBudget(monthK) { try { return await dbGet('budgets', monthK) || { monthKey: monthK }; } catch { return { monthKey: monthK }; } }
+async function saveBudget(budget) { await dbPut('budgets', budget); budgetCache = budget; }
+async function getSavingsGoals() { return dbGetAll('savingsGoals'); }
+function sumByCategory(transactions, type) { const map = {}; transactions.filter(t => t.type === type).forEach(t => { map[t.category] = (map[t.category] || 0) + parseNumber(t.amount); }); return map; }
+function sumByType(transactions, type) { return transactions.filter(t => t.type === type).reduce((s, t) => s + parseNumber(t.amount), 0); }
+async function getRollover(monthK) { const [y, m] = monthK.split('-').map(Number); let pm = m - 2, py = y; if (pm < 0) { pm += 12; py -= 1; } const prevKey = monthKey(py, pm); const prevTxns = await getTransactions(prevKey); const prevBudget = await getBudget(prevKey); const prevIncome = sumByType(prevTxns, 'income') + (prevBudget.incomeRollover || 0); const prevExpense = sumByType(prevTxns, 'expense'); const prevBills = sumByType(prevTxns, 'bill'); const prevDebt = sumByType(prevTxns, 'debt'); const prevSavings = sumByType(prevTxns, 'savings'); return Math.max(0, prevIncome - prevExpense - prevBills - prevDebt - prevSavings); }
+
+/* ====== RENDERING ====== */
+async function switchTab(tab) { currentTab = tab; document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden')); document.getElementById('tab-' + tab).classList.remove('hidden'); document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.dataset.tab === tab)); document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.toggle('active', el.dataset.tab === tab)); await renderTab(tab); }
+async function renderTab(tab) { switch(tab) { case 'dashboard': await renderDashboard(); break; case 'income': await renderCategoryTab('income', 'Income', INCOME_CATS); break; case 'expense': await renderCategoryTab('expense', 'Expense', EXPENSE_CATS); break; case 'bills': await renderCategoryTab('bill', 'Bills', BILL_CATS); break; case 'debt': await renderCategoryTab('debt', 'Debt', DEBT_CATS); break; case 'savings': await renderSavings(); break; case 'ytd': await renderYTD(); break; case 'asset': await renderAssets(); break; case 'tax': await renderTax(); break; } }
+
+async function renderDashboard() {
+  const monthK = currentMonthKey(); const txns = await getTransactions(monthK); const budget = await getBudget(monthK); const rollover = await getRollover(monthK);
+  const totalIncome = sumByType(txns, 'income') + rollover;
+  const totalExpense = sumByType(txns, 'expense'); const totalBills = sumByType(txns, 'bill'); const totalDebt = sumByType(txns, 'debt'); const totalSavings = sumByType(txns, 'savings');
+  const leftover = totalIncome - totalExpense - totalBills - totalDebt - totalSavings;
+  const onTrack = leftover >= 0;
+  const el = document.getElementById('tab-dashboard');
+  el.innerHTML = `<div class="hero-card"><div class="hero-label">Sisa Uang Bulan Ini</div><div class="hero-value">${formatRupiah(leftover)}</div><div class="hero-sub"><div class="hero-sub-item"><div class="hero-sub-label">Income</div><div class="hero-sub-value">${formatRupiah(totalIncome)}</div></div><div class="hero-sub-item"><div class="hero-sub-label">Expense</div><div class="hero-sub-value">${formatRupiah(totalExpense + totalBills)}</div></div><div class="hero-sub-item"><div class="hero-sub-label">Savings</div><div class="hero-sub-value">${formatRupiah(totalSavings)}</div></div></div></div><div class="card mt-4"><div class="card-header"><div class="card-title">Cash Flow Detail</div></div><div class="card-body"><div class="cashflow-grid"><div class="cashflow-row plus"><div class="cashflow-left"><span class="cashflow-sign" style="color:var(--success)">+</span><span class="cashflow-label">Total Income</span></div><div class="cashflow-right positive">${formatRupiah(totalIncome)}</div></div><div class="cashflow-row minus"><div class="cashflow-left"><span class="cashflow-sign" style="color:var(--danger)">−</span><span class="cashflow-label">Expenses</span></div><div class="cashflow-right">${formatRupiah(totalExpense)}</div></div><div class="cashflow-row minus"><div class="cashflow-left"><span class="cashflow-sign" style="color:var(--danger)">−</span><span class="cashflow-label">Bills</span></div><div class="cashflow-right">${formatRupiah(totalBills)}</div></div><div class="cashflow-row minus"><div class="cashflow-left"><span class="cashflow-sign" style="color:var(--danger)">−</span><span class="cashflow-label">Debt</span></div><div class="cashflow-right">${formatRupiah(totalDebt)}</div></div><div class="cashflow-row minus"><div class="cashflow-left"><span class="cashflow-sign" style="color:var(--danger)">−</span><span class="cashflow-label">Savings</span></div><div class="cashflow-right">${formatRupiah(totalSavings)}</div></div></div></div></div><div class="card mt-4"><div class="card-header"><div class="card-title">Status</div><span class="on-track-badge ${onTrack ? 'on' : 'over'}">${onTrack ? 'ON TRACK' : 'OVERBUDGET'}</span></div><div class="card-body"><div class="text-muted" style="font-size:var(--fs-sm)">Rollover bulan lalu: ${formatRupiah(rollover)}</div></div></div><div class="card mt-4"><div class="card-header"><div class="card-title">Distribusi Pengeluaran</div></div><div class="chart-canvas-wrap"><canvas class="chart-canvas" id="dashChart"></canvas></div></div><div class="card mt-4"><div class="card-header"><div class="card-title">Transaksi Terbaru</div><button class="btn btn-sm btn-secondary" onclick="openTxnModal()">+ Tambah</button></div><div class="card-body" id="recentTxns"></div></div>`;
+  const recent = txns.sort((a, b) => new Date(b.date) - new Date(a.date) || (b.id - a.id)).slice(0, 5);
+  const recentEl = document.getElementById('recentTxns');
+  if (recent.length === 0) { recentEl.innerHTML = '<div class="empty-state">' + catIcon('Food') + '<div class="empty-state-text">Belum ada transaksi bulan ini</div></div>'; }
+  else { recentEl.innerHTML = recent.map(t => txnItemHTML(t)).join('') + (txns.length > 5 ? '<div class="text-center text-muted" style="font-size:var(--fs-xs);padding:var(--sp-3)">+' + (txns.length - 5) + ' transaksi lainnya</div>' : ''); }
+  drawPieChart('dashChart', txns.filter(t => t.type === 'expense'));
+  await renderDashboardNetWorth();
+}
+
+async function renderDashboardNetWorth() {
+  const assets = await getAssets(); if (assets.length === 0) return;
+  const el = document.getElementById('tab-dashboard'); if (!el) return; const hero = el.querySelector('.hero-card'); if (!hero) return;
+  const totalValue = assets.reduce((s, a) => s + assetValue(a), 0); const totalCost = assets.reduce((s, a) => s + assetCost(a), 0);
+  const gain = totalValue - totalCost; const gp = totalCost > 0 ? (gain / totalCost) * 100 : 0; const gc = gain >= 0 ? 'var(--success)' : 'var(--danger)';
+  const html = '<div class="card mt-4" onclick="switchTab(\'asset\')" style="cursor:pointer"><div class="card-header"><div class="card-title">Kekayaan Aset (Net Worth)</div><span class="category-badge">Lihat semua</span></div><div class="card-body"><div class="flex justify-between items-center"><div><div class="fw-bold" style="font-size:var(--fs-2xl)">' + formatRupiah(totalValue) + '</div><div style="font-size:var(--fs-sm);color:' + gc + '">' + formatPct(gp) + ' \u00b7 ' + formatRupiah(gain) + '</div></div><div class="text-right text-muted" style="font-size:var(--fs-xs)">' + assets.length + ' aset</div></div></div></div>';
+  hero.insertAdjacentHTML('afterend', html);
+}
+
+function txnItemHTML(t) {
+  const icon = catIcon(t.category); const typeClass = t.type === 'income' ? 'income' : 'expense'; const sign = t.type === 'income' ? '+' : '−';
+  const d = new Date(t.date); const dateStr = d.getDate() + ' ' + MONTH_SHORT[d.getMonth()];
+  return '<div class="txn-item" onclick="editTxn(' + t.id + ')"><div class="txn-item-icon" style="color:' + (t.type === 'income' ? 'var(--success)' : 'var(--fg-secondary)') + '">' + icon + '</div><div class="txn-item-body"><div class="txn-item-name">' + escapeHtml(t.category) + '</div><div class="txn-item-meta"><span>' + dateStr + '</span>' + (t.description ? '<span>· ' + escapeHtml(t.description) + '</span>' : '') + '<span class="category-badge">' + typeLabel(t.type) + '</span></div></div><div class="txn-item-amount ' + typeClass + '">' + sign + formatRupiah(t.amount) + '</div></div>';
+}
+
+async function renderCategoryTab(type, title, cats) {
+  const monthK = currentMonthKey(); const txns = await getTransactions(monthK); const budget = await getBudget(monthK); const sums = sumByCategory(txns, type);
+  const totalActual = cats.reduce((s, c) => s + (sums[c] || 0), 0); const totalExpected = cats.reduce((s, c) => s + (budget[type + '_' + c] || 0), 0);
+  const pct = totalExpected > 0 ? Math.min(100, (totalActual / totalExpected) * 100) : 0;
+  const el = document.getElementById('tab-' + (type === 'bill' ? 'bills' : type === 'debt' ? 'debt' : type));
+  el.innerHTML = '<div class="card"><div class="card-header"><div class="card-title">Total ' + title + ' Bulan Ini</div><button class="btn btn-sm btn-secondary" onclick="openBudgetModal(\'' + type + '\')">Set Expected</button></div><div class="card-body"><div class="flex justify-between items-center mb-4"><div><div class="text-muted" style="font-size:var(--fs-xs)">Actual</div><div class="fw-bold" style="font-size:var(--fs-2xl)">' + formatRupiah(totalActual) + '</div></div><div class="text-right"><div class="text-muted" style="font-size:var(--fs-xs)">Expected</div><div class="fw-bold text-muted" style="font-size:var(--fs-xl)">' + formatRupiah(totalExpected) + '</div></div></div><div class="progress-track"><div class="progress-fill" style="width:' + pct + '%;background:' + (pct > 100 ? 'var(--c-danger)' : 'var(--brand-grad)') + '"></div></div><div class="progress-label-row"><span>' + pct.toFixed(0) + '% terpakai</span><span>Sisa: ' + formatRupiah(Math.max(0, totalExpected - totalActual)) + '</span></div></div></div><div class="card mt-4"><div class="card-header"><div class="card-title">Per Kategori</div></div><div class="card-body" id="catList"></div></div><div class="card mt-4"><div class="card-header"><div class="card-title">Transaksi ' + title + ' Bulan Ini</div><button class="btn btn-sm btn-secondary" onclick="openTxnModal(\'' + type + '\')">+ Tambah</button></div><div class="card-body" id="txnList"></div></div>';
+  const catListEl = document.getElementById('catList');
+  catListEl.innerHTML = cats.map((c, i) => {
+    const act = sums[c] || 0; const exp = budget[type + '_' + c] || 0; const p = exp > 0 ? Math.min(100, (act / exp) * 100) : 0;
+    const color = p > 100 ? 'var(--danger)' : colorForIndex(i);
+    return '<div class="savings-item" style="margin-bottom:var(--sp-3)"><div class="savings-header"><div class="savings-name" style="color:var(--fg)">' + catIcon(c) + ' ' + c + '</div><div class="savings-pct" style="color:' + (p > 100 ? 'var(--danger)' : 'var(--emerald-bright)') + '">' + p.toFixed(0) + '%</div></div><div class="progress-track"><div class="progress-fill" style="width:' + p + '%;background:' + color + '"></div></div><div class="progress-label-row"><span>' + formatRupiah(act) + '</span><span class="text-muted">Expected: ' + formatRupiah(exp) + '</span></div></div>';
+  }).join('');
+  const filtered = txns.filter(t => t.type === type).sort((a, b) => new Date(b.date) - new Date(a.date) || (b.id - a.id));
+  const txnListEl = document.getElementById('txnList');
+  if (filtered.length === 0) { txnListEl.innerHTML = '<div class="empty-state">' + catIcon(cats[0]) + '<div class="empty-state-text">Belum ada transaksi ' + title.toLowerCase() + ' bulan ini</div></div>'; }
+  else { txnListEl.innerHTML = filtered.map(t => txnItemHTML(t)).join(''); }
+}
+
+async function renderSavings() {
+  const monthK = currentMonthKey(); const txns = await getTransactions(monthK); const budget = await getBudget(monthK); const sums = sumByCategory(txns, 'savings'); const goals = await getSavingsGoals(); const goalsMap = {}; goals.forEach(g => goalsMap[g.name] = g);
+  const el = document.getElementById('tab-savings');
+  el.innerHTML = '<div class="card"><div class="card-header"><div class="card-title">Total Tabungan Bulan Ini</div><button class="btn btn-sm btn-secondary" onclick="openBudgetModal(\'savings\')">Set Expected</button></div><div class="card-body"><div class="fw-bold" style="font-size:var(--fs-2xl)">' + formatRupiah(sumByType(txns, 'savings')) + '</div></div></div><div class="section-title">Savings Goal Tracker</div><div id="savingsGoalsContainer"></div><div class="card mt-4"><div class="card-header"><div class="card-title">Transaksi Savings Bulan Ini</div><button class="btn btn-sm btn-secondary" onclick="openTxnModal(\'savings\')">+ Tambah</button></div><div class="card-body" id="savingsTxnList"></div></div>';
+  const goalsEl = document.getElementById('savingsGoalsContainer');
+  goalsEl.innerHTML = SAVINGS_CATS.map((c, i) => {
+    const actual = sums[c] || 0; const expected = budget['savings_' + c] || 0; const goal = goalsMap[c] ? goalsMap[c].target : 0; const totalSaved = goalsMap[c] ? goalsMap[c].totalSaved : 0;
+    const pct = goal > 0 ? Math.min(100, (totalSaved / goal) * 100) : 0; const monthlyPct = expected > 0 ? Math.min(100, (actual / expected) * 100) : 0; const color = colorForIndex(i);
+    return '<div class="card mt-4"><div class="card-body"><div class="savings-header"><div class="savings-name" style="color:var(--fg)">' + catIcon(c) + ' ' + c + '</div><div class="savings-pct" style="color:' + color + '">' + pct.toFixed(0) + '% goal</div></div>' + (goal > 0 ? '<div class="progress-track mt-2"><div class="progress-fill" style="width:' + pct + '%;background:' + color + '"></div></div><div class="progress-label-row"><span>' + formatRupiah(totalSaved) + ' / ' + formatRupiah(goal) + '</span><span class="text-muted">Sisa: ' + formatRupiah(Math.max(0, goal - totalSaved)) + '</span></div>' : '<div class="text-muted" style="font-size:var(--fs-xs);margin-top:var(--sp-2)">Belum ada target. Set di bawah ini.</div>') + '<div class="progress-track mt-4"><div class="progress-fill" style="width:' + monthlyPct + '%;background:' + (monthlyPct > 100 ? 'var(--danger)' : color) + '"></div></div><div class="progress-label-row"><span>Bulan ini: ' + formatRupiah(actual) + '</span><span class="text-muted">Expected: ' + formatRupiah(expected) + '</span></div><div class="savings-input-row"><input type="number" class="form-input" placeholder="Target goal" value="' + (goal || '') + '" id="goal_' + i + '" min="0" style="font-size:var(--fs-sm)"><button class="btn btn-sm btn-primary" onclick="saveSavingsGoal(\'' + c + '\', ' + i + ')">Set</button></div></div></div>';
+  }).join('');
+  const filtered = txns.filter(t => t.type === 'savings').sort((a, b) => new Date(b.date) - new Date(a.date) || (b.id - a.id));
+  const txnListEl = document.getElementById('savingsTxnList');
+  if (filtered.length === 0) { txnListEl.innerHTML = '<div class="empty-state">' + catIcon('Travel Fund') + '<div class="empty-state-text">Belum ada transaksi savings bulan ini</div></div>'; }
+  else { txnListEl.innerHTML = filtered.map(t => txnItemHTML(t)).join(''); }
+}
+
+async function renderYTD() {
+  const year = currentYear; const monthsData = [];
+  for (let m = 0; m <= currentMonth; m++) { const mk = monthKey(year, m); const txns = await getTransactions(mk); monthsData.push({ month: m, key: mk, income: sumByType(txns, 'income'), expense: sumByType(txns, 'expense'), bills: sumByType(txns, 'bill'), debt: sumByType(txns, 'debt'), savings: sumByType(txns, 'savings') }); }
+  let totalIncome = 0, totalExpense = 0, totalBills = 0, totalDebt = 0, totalSavings = 0;
+  monthsData.forEach(d => { totalIncome += d.income; totalExpense += d.expense; totalBills += d.bills; totalDebt += d.debt; totalSavings += d.savings; });
+  const totalLeft = totalIncome - totalExpense - totalBills - totalDebt - totalSavings;
+  const el = document.getElementById('tab-ytd');
+  el.innerHTML = '<div class="hero-card" style="background:linear-gradient(135deg,#0d9488 0%,#0891b2 100%)"><div class="hero-label">Year-to-Date ' + year + '</div><div class="hero-value">' + formatRupiah(totalLeft) + '</div><div class="hero-sub"><div class="hero-sub-item"><div class="hero-sub-label">Income</div><div class="hero-sub-value">' + formatRupiah(totalIncome) + '</div></div><div class="hero-sub-item"><div class="hero-sub-label">Expense</div><div class="hero-sub-value">' + formatRupiah(totalExpense + totalBills) + '</div></div><div class="hero-sub-item"><div class="hero-sub-label">Savings</div><div class="hero-sub-value">' + formatRupiah(totalSavings) + '</div></div></div></div><div class="card mt-4"><div class="card-header"><div class="card-title">Trend Bulanan</div></div><div class="chart-canvas-wrap"><canvas class="chart-canvas" id="ytdChart" style="height:220px"></canvas></div></div><div class="card mt-4"><div class="card-header"><div class="card-title">Breakdown Expenses YTD</div></div><div class="chart-canvas-wrap"><canvas class="chart-canvas" id="ytdPieChart"></canvas></div></div><div class="card mt-4"><div class="card-header"><div class="card-title">Detail per Bulan</div></div><div class="card-body" style="overflow-x:auto"><table class="summary-table"><thead><tr><th>Bulan</th><th class="text-right">Income</th><th class="text-right">Expense</th><th class="text-right">Sisa</th></tr></thead><tbody>' + monthsData.map(d => '<tr><td>' + MONTH_SHORT[d.month] + ' ' + year + '</td><td class="text-right text-success">' + formatRupiahShort(d.income) + '</td><td class="text-right text-danger">' + formatRupiahShort(d.expense + d.bills) + '</td><td class="text-right fw-bold">' + formatRupiahShort(d.income - d.expense - d.bills - d.debt - d.savings) + '</td></tr>').join('') + '</tbody><tfoot><tr><td>Total</td><td class="text-right text-success">' + formatRupiahShort(totalIncome) + '</td><td class="text-right text-danger">' + formatRupiahShort(totalExpense + totalBills) + '</td><td class="text-right fw-bold">' + formatRupiahShort(totalLeft) + '</td></tr></tfoot></table></div></div>';
+  drawBarChart('ytdChart', monthsData);
+  const allTxns = []; for (const d of monthsData) { const txns = await getTransactions(d.key); allTxns.push(...txns.filter(t => t.type === 'expense')); }
+  drawPieChart('ytdPieChart', allTxns);
+}
+
+/* ====== CHARTS ====== */
+function getCSSVar(name) { const v = getComputedStyle(document.documentElement).getPropertyValue(name); return v.trim() || '#999'; }
+function drawPieChart(canvasId, expenseTxns) {
+  const canvas = document.getElementById(canvasId); if (!canvas) return; const ctx = canvas.getContext('2d'); const dpr = window.devicePixelRatio || 1; const rect = canvas.getBoundingClientRect(); canvas.width = rect.width * dpr; canvas.height = rect.height * dpr; ctx.scale(dpr, dpr); ctx.clearRect(0, 0, rect.width, rect.height);
+  const catSums = {}; expenseTxns.forEach(t => { catSums[t.category] = (catSums[t.category] || 0) + parseNumber(t.amount); }); const entries = Object.entries(catSums).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+  if (entries.length === 0) { ctx.fillStyle = getCSSVar('--muted'); ctx.font = '13px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Belum ada data pengeluaran', rect.width / 2, rect.height / 2); return; }
+  const total = entries.reduce((s, [, v]) => s + v, 0); const cx = rect.width / 2, cy = rect.height / 2; const radius = Math.min(rect.width, rect.height) / 2 * 0.7; let angle = -Math.PI / 2;
+  entries.forEach((entry, i) => { const sliceAngle = (entry[1] / total) * Math.PI * 2; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, radius, angle, angle + sliceAngle); ctx.closePath(); ctx.fillStyle = colorForIndex(i); ctx.fill(); angle += sliceAngle; });
+  let legendY = 0; ctx.font = '11px sans-serif'; ctx.textAlign = 'left';
+  entries.forEach((entry, i) => { if (legendY > rect.height - 20) return; ctx.fillStyle = colorForIndex(i); ctx.fillRect(8, legendY + 2, 10, 10); ctx.fillStyle = getCSSVar('--fg-secondary'); const pct = ((entry[1] / total) * 100).toFixed(0); let label = entry[0]; if (label.length > 15) label = label.substring(0, 13) + '..'; ctx.fillText(label + ' (' + pct + '%)', 22, legendY + 11); legendY += 18; });
+}
+function drawBarChart(canvasId, monthsData) {
+  const canvas = document.getElementById(canvasId); if (!canvas) return; const ctx = canvas.getContext('2d'); const dpr = window.devicePixelRatio || 1; const rect = canvas.getBoundingClientRect(); canvas.width = rect.width * dpr; canvas.height = rect.height * dpr; ctx.scale(dpr, dpr); ctx.clearRect(0, 0, rect.width, rect.height);
+  if (monthsData.length === 0) return; const padding = { top: 20, right: 16, bottom: 30, left: 50 }; const chartW = rect.width - padding.left - padding.right; const chartH = rect.height - padding.top - padding.bottom;
+  const values = monthsData.map(d => [d.income, d.expense + d.bills, d.savings]); const maxVal = Math.max(...values.flat(), 1); const niceMax = Math.ceil(maxVal / 1000000) * 1000000 || Math.ceil(maxVal / 100000) * 100000 || maxVal;
+  const barCount = monthsData.length; const barGroupW = chartW / barCount; const barW = Math.max(8, Math.min(30, barGroupW * 0.25)); const gap = 3;
+  ctx.strokeStyle = getCSSVar('--border'); ctx.lineWidth = 1; ctx.font = '10px sans-serif'; ctx.fillStyle = getCSSVar('--muted'); ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) { const y = padding.top + (chartH / 4) * i; const val = niceMax - (niceMax / 4) * i; ctx.beginPath(); ctx.moveTo(padding.left, y); ctx.lineTo(rect.width - padding.right, y); ctx.stroke(); ctx.fillText(formatRupiahShort(val), padding.left - 4, y + 3); }
+  monthsData.forEach((d, i) => { const x0 = padding.left + barGroupW * i; const incomes = [d.income, d.expense + d.bills, d.savings]; const colors = ['#10b981', '#f43f5e', '#8b5cf6']; incomes.forEach((val, j) => { const h = (val / niceMax) * chartH; const x = x0 + barGroupW / 2 - (barW * 1.5) + j * (barW + gap); const y = padding.top + chartH - h; ctx.fillStyle = colors[j]; ctx.fillRect(x, y, barW, h); }); ctx.fillStyle = getCSSVar('--muted'); ctx.font = '11px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(MONTH_SHORT[d.month], x0 + barGroupW / 2, rect.height - 10); });
+}
+
+/* ====== TRANSACTION MODAL ====== */
+function openTxnModal(presetType) {
+  editingTxnId = null; document.getElementById('txnModalTitle').textContent = 'Tambah Transaksi'; document.getElementById('txnId').value = ''; document.getElementById('txnAmount').value = ''; document.getElementById('txnDesc').value = ''; document.getElementById('txnDate').value = new Date().toISOString().split('T')[0]; document.getElementById('deleteTxnBtn').style.display = 'none';
+  if (presetType) { selectedTxnType = presetType; } else { selectedTxnType = 'expense'; }
+  updateTxnTypeButtons(); populateCategoryDropdown(); document.getElementById('txnModal').classList.add('active');
+}
+async function editTxn(id) { try { const t = await dbGet('transactions', id); if (!t) return; editingTxnId = id; document.getElementById('txnModalTitle').textContent = 'Edit Transaksi'; document.getElementById('txnId').value = id; document.getElementById('txnAmount').value = t.amount; document.getElementById('txnDesc').value = t.description || ''; document.getElementById('txnDate').value = t.date; document.getElementById('deleteTxnBtn').style.display = 'inline-flex'; selectedTxnType = t.type; updateTxnTypeButtons(); populateCategoryDropdown(); document.getElementById('txnCategory').value = t.category; document.getElementById('txnModal').classList.add('active'); } catch(e) { console.error(e); } }
+function closeTxnModal() { document.getElementById('txnModal').classList.remove('active'); }
+function updateTxnTypeButtons() { ['Expense','Income','Bill','Debt','Savings'].forEach(t => { const btn = document.getElementById('type' + t); const type = t.toLowerCase(); if (selectedTxnType === type) { btn.style.background = 'var(--brand-grad)'; btn.style.color = 'white'; btn.style.borderColor = 'transparent'; } else { btn.style.background = ''; btn.style.color = ''; btn.style.borderColor = ''; } }); }
+function populateCategoryDropdown() { const select = document.getElementById('txnCategory'); const cats = ALL_CATS[selectedTxnType] || []; select.innerHTML = cats.map(c => '<option value="' + c + '">' + c + '</option>').join(''); }
+async function saveTxn() {
+  const amount = parseNumber(document.getElementById('txnAmount').value); const category = document.getElementById('txnCategory').value; const date = document.getElementById('txnDate').value; const desc = document.getElementById('txnDesc').value.trim();
+  if (amount <= 0) { alert('Jumlah harus lebih dari 0'); return; } if (!date) { alert('Tanggal wajib diisi'); return; }
+  const d = new Date(date); const mk = monthKey(d.getFullYear(), d.getMonth());
+  const txn = { type: selectedTxnType, category, amount, date, description: desc, monthKey: mk, createdAt: new Date().toISOString() };
+  try {
+    if (editingTxnId) { txn.id = editingTxnId; await dbPut('transactions', txn); }
+    else { await dbAdd('transactions', txn); }
+    if (selectedTxnType === 'savings') { const goals = await getSavingsGoals(); let goal = goals.find(g => g.name === category); if (goal) { if (editingTxnId) { const oldTxn = await dbGet('transactions', editingTxnId); goal.totalSaved = (goal.totalSaved||0) - (oldTxn?oldTxn.amount:0) + amount; } else { goal.totalSaved = (goal.totalSaved||0) + amount; } await dbPut('savingsGoals', goal); } }
+    closeTxnModal(); await renderTab(currentTab); await renderMonthLabel();
+  } catch(e) { alert('Error menyimpan: ' + e.message); }
+}
+async function deleteTxn() {
+  if (!editingTxnId) return; if (!confirm('Hapus transaksi ini?')) return;
+  try { const txn = await dbGet('transactions', editingTxnId); if (txn && txn.type === 'savings') { const goals = await getSavingsGoals(); const goal = goals.find(g => g.name === txn.category); if (goal) { goal.totalSaved = Math.max(0, (goal.totalSaved||0) - txn.amount); await dbPut('savingsGoals', goal); } } await dbDelete('transactions', editingTxnId); closeTxnModal(); await renderTab(currentTab); } catch(e) { alert('Error menghapus: ' + e.message); }
+}
+
+/* ====== BUDGET MODAL ====== */
+async function openBudgetModal(type) {
+  const monthK = currentMonthKey(); const budget = await getBudget(monthK); const cats = ALL_CATS[type] || [];
+  const body = document.getElementById('budgetModalBody');
+  body.innerHTML = cats.map(c => { const key = type + '_' + c; return '<div class="form-group"><label class="form-label">' + c + '</label><input type="number" class="form-input budget-input" data-key="' + key + '" placeholder="0" value="' + (budget[key] || '') + '" min="0" step="1000"></div>'; }).join('');
+  if (type === 'income') { body.insertAdjacentHTML('afterbegin', '<div class="form-group"><label class="form-label">Rollover dari bulan lalu</label><input type="number" class="form-input budget-input" data-key="incomeRollover" placeholder="0" value="' + (budget.incomeRollover || '') + '" min="0" step="1000"></div>'); }
+  document.getElementById('budgetModal').classList.add('active');
+}
+function closeBudgetModal() { document.getElementById('budgetModal').classList.remove('active'); }
+async function saveBudgetData() { const monthK = currentMonthKey(); const budget = budgetCache || await getBudget(monthK); budget.monthKey = monthK; document.querySelectorAll('.budget-input').forEach(inp => { budget[inp.dataset.key] = parseNumber(inp.value); }); await saveBudget(budget); closeBudgetModal(); await renderTab(currentTab); }
+
+/* ====== SAVINGS GOAL ====== */
+async function saveSavingsGoal(category, idx) {
+  const input = document.getElementById('goal_' + idx); const target = parseNumber(input.value); const goals = await getSavingsGoals(); let goal = goals.find(g => g.name === category);
+  if (goal) { goal.target = target; await dbPut('savingsGoals', goal); }
+  else { await dbAdd('savingsGoals', { name: category, target, totalSaved: 0 }); const allTxns = await dbGetAll('transactions'); const saved = allTxns.filter(t => t.type === 'savings' && t.category === category).reduce((s, t) => s + t.amount, 0); const newGoals = await getSavingsGoals(); const newGoal = newGoals.find(g => g.name === category); if (newGoal) { newGoal.totalSaved = saved; await dbPut('savingsGoals', newGoal); } }
+  await renderSavings();
+}
+
+/* ====== EXPORT / IMPORT ====== */
+async function exportData() { const txns = await dbGetAll('transactions'); const budgets = await dbGetAll('budgets'); const goals = await dbGetAll('savingsGoals'); const data = { version: 2, app: 'Vaultin', exportedAt: new Date().toISOString(), transactions: txns, budgets, savingsGoals: goals }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'vaultin-export-' + new Date().toISOString().split('T')[0] + '.json'; a.click(); URL.revokeObjectURL(url); }
+async function importData(file) { try { const text = await file.text(); if (file.name.endsWith('.json')) { const data = JSON.parse(text); if (!data.transactions) { alert('Format tidak valid'); return; } if (confirm('Import akan menambah data ke yang ada. Lanjutkan?')) { for (const t of data.transactions) { await dbPut('transactions', t); } for (const b of data.budgets||[]) { await dbPut('budgets', b); } for (const g of data.savingsGoals||[]) { await dbPut('savingsGoals', g); } alert('Data berhasil diimport!'); await renderTab(currentTab); } } else if (file.name.endsWith('.csv')) { const lines = text.split('\n').filter(l => l.trim()); for (let i = 1; i < lines.length; i++) { const vals = lines[i].match(/("[^"]*")|[^,]+/g); if (!vals || vals.length < 5) continue; const cv = v => v.replace(/^"|"$/g,'').replace(/""/g,'"'); const d = new Date(vals[4]); await dbAdd('transactions', { type: cv(vals[1]), category: cv(vals[2]), amount: parseNumber(vals[3]), date: vals[4], description: vals[5]?cv(vals[5]):'', monthKey: monthKey(d.getFullYear(), d.getMonth()), createdAt: new Date().toISOString() }); } alert('CSV berhasil diimport!'); await renderTab(currentTab); } } catch(e) { alert('Error importing: ' + e.message); } }
+
+/* ====== SCAN STRUK (OCR) ====== */
+function openScanModal() { resetScanModal(); document.getElementById('scanDate').value = new Date().toISOString().split('T')[0]; document.getElementById('scanModal').classList.add('active'); }
+function closeScanModal() { document.getElementById('scanModal').classList.remove('active'); }
+function resetScanModal() {
+  const preview = document.getElementById('scanPreview');
+  preview.classList.remove('has-image');
+  preview.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg><div style="font-size:var(--fs-base);font-weight:600;margin-top:var(--sp-2)">Ketuk untuk upload foto struk</div><div style="font-size:var(--fs-sm);color:var(--muted);margin-top:var(--sp-2)">Atau screenshot struk belanja kamu</div><input type="file" id="scanFileInput" accept="image/*" style="display:none">';
+  document.getElementById('scanFileInput').addEventListener('change', handleScanFile);
+  document.getElementById('scanStatus').style.display = 'none'; document.getElementById('scanStatus').innerHTML = '';
+  document.getElementById('scanResult').style.display = 'none'; document.getElementById('scanResult').innerHTML = '';
+  document.getElementById('scanForm').style.display = 'none'; document.getElementById('saveScanBtn').disabled = true;
+  scanSelectedCategory = null; scanSelectedType = 'expense';
+}
+function handleScanFile(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const preview = document.getElementById('scanPreview');
+    preview.classList.add('has-image');
+    preview.innerHTML = '<img src="' + ev.target.result + '" alt="Preview struk"><input type="file" id="scanFileInput" accept="image/*" style="display:none">';
+    document.getElementById('scanFileInput').addEventListener('change', handleScanFile);
+    processScanOCR(ev.target.result, file.name);
+  };
+  reader.readAsDataURL(file);
+}
+async function processScanOCR(imageDataUrl, fileName) {
+  const statusEl = document.getElementById('scanStatus');
+  statusEl.style.display = 'flex'; statusEl.innerHTML = '<div class="spinner"></div><div>Memindai struk... Tunggu sebentar</div>';
+  document.getElementById('scanResult').style.display = 'none'; document.getElementById('scanForm').style.display = 'none'; document.getElementById('saveScanBtn').disabled = true;
+  try {
+    const processedImage = await preprocessImage(imageDataUrl);
+    const result = await Tesseract.recognize(processedImage, 'ind+eng', { logger: m => { if (m.status === 'recognizing text') { statusEl.innerHTML = '<div class="spinner"></div><div>Membaca teks... ' + Math.round(m.progress * 100) + '%</div>'; } } });
+    const rawText = result.data.text || '';
+    statusEl.innerHTML = '<div style="font-size:18px">OK</div><div>Scan selesai! Menganalisis...</div>';
+    const parsed = parseReceiptText(rawText);
+    const guesses = guessCategory(parsed.merchant + ' ' + parsed.allText);
+    statusEl.style.display = 'none';
+    const resultEl = document.getElementById('scanResult');
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = '<div class="scan-result-row"><span>Teks terbaca:</span><span style="font-size:var(--fs-xs);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="rawTextToggle">Lihat</span></div><div id="rawTextFull" style="display:none;padding:var(--sp-2);font-size:var(--fs-xs);color:var(--muted);white-space:pre-wrap;max-height:150px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r-sm);margin:var(--sp-2) 0">' + escapeHtml(rawText) + '</div><div class="scan-result-row"><span>Toko:</span><span>' + escapeHtml(parsed.merchant || 'Tidak terdeteksi') + '</span></div><div class="scan-result-row"><span>Total terdeteksi:</span><span class="fw-bold text-primary">' + (parsed.total !== null ? formatRupiah(parsed.total) : 'Tidak ditemukan') + '</span></div><div class="scan-result-row"><span>Tanggal:</span><span>' + (parsed.date || 'Tidak ditemukan') + '</span></div>';
+    setTimeout(() => { const toggle = document.getElementById('rawTextToggle'); if (toggle) toggle.addEventListener('click', () => { const full = document.getElementById('rawTextFull'); full.style.display = full.style.display === 'none' ? 'block' : 'none'; }); }, 100);
+    document.getElementById('scanAmount').value = parsed.total || '';
+    document.getElementById('scanDesc').value = parsed.merchant || '';
+    if (parsed.date) { try { const parsed_date = new Date(parsed.date); if (!isNaN(parsed_date.getTime())) { document.getElementById('scanDate').value = parsed_date.toISOString().split('T')[0]; } } catch(_) {} }
+    const guessEl = document.getElementById('scanCategoryGuess');
+    if (guesses.length > 0) {
+      guessEl.innerHTML = guesses.map((g, i) => { const parts = g.split('|'); return '<div class="guess-pill ' + (i === 0 ? 'selected' : '') + '" data-cat="' + parts[0] + '" data-type="' + parts[1] + '">' + catIcon(parts[0]) + ' ' + parts[0] + '</div>'; }).join('');
+      scanSelectedCategory = guesses[0].split('|')[0]; scanSelectedType = guesses[0].split('|')[1];
+      const manualSelect = document.getElementById('scanCategoryManual'); if (manualSelect) { for (let i = 0; i < manualSelect.options.length; i++) { if (manualSelect.options[i].value === scanSelectedCategory + '|' + scanSelectedType) { manualSelect.selectedIndex = i; break; } } }
+      guessEl.querySelectorAll('.guess-pill').forEach(p => p.addEventListener('click', () => { guessEl.querySelectorAll('.guess-pill').forEach(x => x.classList.remove('selected')); p.classList.add('selected'); scanSelectedCategory = p.dataset.cat; scanSelectedType = p.dataset.type; const ms = document.getElementById('scanCategoryManual'); if (ms) { for (let i = 0; i < ms.options.length; i++) { if (ms.options[i].value === scanSelectedCategory + '|' + scanSelectedType) { ms.selectedIndex = i; break; } } } }));
+    } else { guessEl.innerHTML = '<div class="text-muted" style="font-size:var(--fs-sm)">Tidak ada tebakan kategori. Pilih manual di bawah.</div>'; }
+    document.getElementById('scanForm').style.display = 'block'; document.getElementById('saveScanBtn').disabled = false;
+  } catch (err) {
+    statusEl.style.display = 'none'; const resultEl = document.getElementById('scanResult'); resultEl.style.display = 'block'; resultEl.innerHTML = '<div style="padding:var(--sp-4);text-align:center"><div style="font-size:20px;margin-bottom:var(--sp-2)">OCR gagal</div><div style="font-size:var(--fs-sm);color:var(--muted);margin-top:var(--sp-2)">Kamu bisa input manual di bawah.</div></div>';
+    document.getElementById('scanForm').style.display = 'block'; document.getElementById('saveScanBtn').disabled = false;
+  }
+}
+async function preprocessImage(dataUrl) { return new Promise((resolve) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const maxW = 1200; let w = img.width, h = img.height; if (w > maxW) { h = (h * maxW) / w; w = maxW; } canvas.width = w; canvas.height = h; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h); const imgData = ctx.getImageData(0, 0, w, h); const d = imgData.data; const contrast = 1.5; const intercept = 128 * (1 - contrast); for (let i = 0; i < d.length; i += 4) { let g = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2]; g = g * contrast + intercept; g = Math.max(0, Math.min(255, g)); d[i] = d[i+1] = d[i+2] = g; } ctx.putImageData(imgData, 0, 0); resolve(canvas.toDataURL('image/png')); }; img.onerror = () => resolve(dataUrl); img.src = dataUrl; }); }
+function parseReceiptText(text) {
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  const allText = lines.join(' ').toLowerCase();
+  let total = null; let merchant = ''; let date = null;
+  const totalPatterns = [
+    /(?:grand\s*total|total\s*belanja|total)\s*Rp\.?\s*([\d.]+(?:,\d+)?)/i,
+    /(?:grand\s*total|total\s*belanja|total)\s*[:]?\s*([\d]{3,}[\d.]*(?:,\d+)?)/i,
+    /(?:total)\s*([\d]{3,}[\d.]*(?:,\d+)?)/i,
+    /(?:jumlah)\s*[:]?\s*([\d]{3,}[\d.]*(?:,\d+)?)/i,
+    /bp\s*([\d]{3,}[\d.]*(?:,\d+)?)/i,
+    /([\d]{1,3}(?:[.][\d]{3})+(?:[,][\d]{1,2})?)(?:\s*$)/im,
+  ];
+  for (const p of totalPatterns) { const m = allText.match(p); if (m && m[1]) { let numStr = m[1].replace(/\./g, '').replace(/,/g, '.'); let num = parseFloat(numStr); if (!isNaN(num) && num > 100) { total = num; break; } } }
+  if (total === null) { const allNums = allText.match(/[\d]{1,3}(?:[.][\d]{3})+(?:[,][\d]{1,2})?/g); if (allNums) { let maxNum = 0; allNums.forEach(s => { let n = parseFloat(s.replace(/\./g,'').replace(/,/g,'.')); if (!isNaN(n) && n > maxNum && n < 100000000) maxNum = n; }); if (maxNum > 100) total = maxNum; } }
+  for (const line of lines) { if (!/^[\d\s.,-]+$/.test(line) && line.length >= 2 && line.length <= 40) { merchant = line.replace(/[^a-zA-Z0-9\s&'-]/g, '').trim(); if (merchant.length >= 2) break; } }
+  const datePatterns = [ /([0-3]?\d)[/\-]([01]?\d)[/\-](20\d{2})/, /([0-3]?\d)[/\-]([01]?\d)[/\-](\d{2})\b/, /([0-3]?\d)\s+(jan|feb|mar|apr|mei|jun|jul|agu|sep|okt|nov|des|january|february|march|april|may|june|july|august|september|october|november|december)\s+(20\d{2})/i ];
+  for (const p of datePatterns) { const m = text.match(p); if (m) { date = m[0]; break; } }
+  return { total, merchant, date, allText };
+}
+function guessCategory(text) { const lower = text.toLowerCase(); const scores = {}; for (const [catKey, keywords] of Object.entries(RECEIPT_KEYWORDS)) { scores[catKey] = 0; for (const kw of keywords) { if (lower.includes(kw)) { scores[catKey] += kw.length; } } } const sorted = Object.entries(scores).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]); if (sorted.length === 0) return ['Food|expense']; return sorted.slice(0, 4).map(([k]) => k); }
+async function saveScanTxn() {
+  const manualSelect = document.getElementById('scanCategoryManual'); let finalCategory = scanSelectedCategory; let finalType = scanSelectedType;
+  if (manualSelect && manualSelect.value) { const parts = manualSelect.value.split('|'); finalCategory = parts[0]; finalType = parts[1]; }
+  const amount = parseNumber(document.getElementById('scanAmount').value); const date = document.getElementById('scanDate').value; const desc = document.getElementById('scanDesc').value.trim();
+  if (amount <= 0) { alert('Total harus lebih dari 0. Isi manual jika OCR tidak terbaca.'); return; } if (!date) { alert('Tanggal wajib'); return; }
+  const d = new Date(date); const mk = monthKey(d.getFullYear(), d.getMonth());
+  const txn = { type: finalType, category: finalCategory, amount, date, description: desc, monthKey: mk, createdAt: new Date().toISOString(), scanned: true };
+  try { await dbAdd('transactions', txn); if (finalType === 'savings') { const goals = await getSavingsGoals(); const goal = goals.find(g => g.name === finalCategory); if (goal) { goal.totalSaved = (goal.totalSaved||0) + amount; await dbPut('savingsGoals', goal); } } closeScanModal(); await renderTab(currentTab); } catch(e) { alert('Error: ' + e.message); }
+}
+
+/* ====== ASSETS — Fase 1: Manajer Aset, Portofolio & ROI ====== */
+let editingAssetId = null;
+const GRAMS_PER_OZ = 31.1034768;
+const ASSET_ICONS = {
+  property: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  vehicle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+  gold: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16l-2 9H6z"/><path d="M9 8l1.5-3h3L15 8"/></svg>',
+  stock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>',
+  crypto: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 8h5a2.5 2.5 0 010 5H9zM9 11h5.5a2.5 2.5 0 010 5H9zM11 6v2M11 18v2M13 6v2M13 18v2"/></svg>',
+  reksadana: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>',
+  deposito: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+  piutang: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11l-3 3-2-2"/></svg>',
+};
+const ASSET_TYPES = [
+  { key: 'property', label: 'Properti', unit: 'unit', single: true, live: false },
+  { key: 'vehicle', label: 'Kendaraan', unit: 'unit', single: true, live: false },
+  { key: 'gold', label: 'Emas / Logam Mulia', unit: 'gram', single: false, live: 'gold' },
+  { key: 'stock', label: 'Saham', unit: 'lembar', single: false, live: false },
+  { key: 'crypto', label: 'Crypto', unit: 'koin', single: false, live: 'crypto' },
+  { key: 'reksadana', label: 'Reksadana', unit: 'unit', single: false, live: false },
+  { key: 'deposito', label: 'Deposito / Tabungan', unit: 'unit', single: true, live: false },
+  { key: 'piutang', label: 'Piutang', unit: 'unit', single: true, live: false },
+];
+const CRYPTO_PRESETS = [['Bitcoin (BTC)','bitcoin'],['Ethereum (ETH)','ethereum'],['BNB','binancecoin'],['Solana (SOL)','solana'],['XRP','ripple'],['Cardano (ADA)','cardano'],['Dogecoin (DOGE)','dogecoin'],['Tether (USDT)','tether'],['USD Coin (USDC)','usd-coin'],['Polkadot (DOT)','polkadot'],['Avalanche (AVAX)','avalanche-2'],['Chainlink (LINK)','chainlink'],['Litecoin (LTC)','litecoin'],['TRON (TRX)','tron'],['Toncoin (TON)','the-open-network'],['Shiba Inu (SHIB)','shiba-inu'],['Polygon (POL)','polygon-ecosystem-token'],['Near (NEAR)','near']];
+function assetTypeDef(key) { return ASSET_TYPES.find(t => t.key === key) || ASSET_TYPES[0]; }
+function assetTypeLabel(key) { return assetTypeDef(key).label; }
+function assetIcon(key) { return ASSET_ICONS[key] || ASSET_ICONS.property; }
+async function getAssets() { try { return await dbGetAll('assets'); } catch { return []; } }
+function assetUnitPrice(a) { const c = parseNumber(a.currentPrice); return c > 0 ? c : parseNumber(a.buyPrice); }
+function assetQty(a) { const q = parseNumber(a.quantity); return q > 0 ? q : 1; }
+function assetValue(a) { return assetQty(a) * assetUnitPrice(a); }
+function assetCost(a) { return assetQty(a) * parseNumber(a.buyPrice); }
+function assetGain(a) { return assetValue(a) - assetCost(a); }
+function assetGainPct(a) { const c = assetCost(a); return c > 0 ? (assetGain(a) / c) * 100 : 0; }
+function formatPct(p) { if (p === null || p === undefined || isNaN(p)) p = 0; return (p >= 0 ? '+' : '') + p.toFixed(1) + '%'; }
+function timeAgo(iso) { if (!iso) return 'belum pernah'; const diff = Date.now() - new Date(iso).getTime(); const m = Math.floor(diff / 60000); if (m < 1) return 'baru saja'; if (m < 60) return m + ' mnt lalu'; const h = Math.floor(m / 60); if (h < 24) return h + ' jam lalu'; const d = Math.floor(h / 24); return d + ' hari lalu'; }
+let assetToastTimer = null;
+function assetToast(msg, isErr) { let t = document.getElementById('vtToast'); if (!t) { t = document.createElement('div'); t.id = 'vtToast'; t.className = 'vt-toast'; document.body.appendChild(t); } t.textContent = msg; t.classList.toggle('error', !!isErr); requestAnimationFrame(() => t.classList.add('show')); clearTimeout(assetToastTimer); assetToastTimer = setTimeout(() => t.classList.remove('show'), 3600); }
+
+async function renderAssets() {
+  const assets = (await getAssets()).sort((a, b) => assetValue(b) - assetValue(a));
+  const el = document.getElementById('tab-asset');
+  const totalValue = assets.reduce((s, a) => s + assetValue(a), 0);
+  const totalCost = assets.reduce((s, a) => s + assetCost(a), 0);
+  const gain = totalValue - totalCost; const gainPct = totalCost > 0 ? (gain / totalCost) * 100 : 0;
+  const liveCount = assets.filter(a => a.liveEnabled && (a.priceSource === 'crypto' || a.priceSource === 'gold')).length;
+  const lastUpd = assets.filter(a => a.lastPriceUpdate).map(a => a.lastPriceUpdate).sort().pop();
+  el.innerHTML = '<div class="hero-card" style="background:linear-gradient(135deg,#0d9488 0%,#0891b2 100%)"><div class="hero-label">Total Kekayaan Aset (Net Worth)</div><div class="hero-value">' + formatRupiah(totalValue) + '</div><div class="hero-sub"><div class="hero-sub-item"><div class="hero-sub-label">Modal Awal</div><div class="hero-sub-value">' + formatRupiahShort(totalCost) + '</div></div><div class="hero-sub-item"><div class="hero-sub-label">Untung/Rugi</div><div class="hero-sub-value">' + formatRupiahShort(gain) + '</div></div><div class="hero-sub-item"><div class="hero-sub-label">ROI</div><div class="hero-sub-value">' + formatPct(gainPct) + '</div></div></div></div>'
+    + '<div class="card mt-4"><div class="card-header"><div class="card-title">Aset Saya</div><button class="btn btn-sm btn-primary" onclick="openAssetModal()">+ Tambah Aset</button></div><div class="card-body" style="display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);flex-wrap:wrap"><div class="text-muted" style="font-size:var(--fs-xs)">' + (liveCount > 0 ? ('Live: ' + liveCount + ' aset \u00b7 update ' + timeAgo(lastUpd)) : 'Belum ada aset live') + '</div><button class="btn btn-sm btn-secondary" onclick="refreshAssetPrices()" ' + (liveCount === 0 ? 'disabled' : '') + '>Refresh Harga Live</button></div></div>';
+  if (assets.length === 0) { el.innerHTML += '<div class="card mt-4"><div class="card-body"><div class="empty-state">' + assetIcon('gold') + '<div class="empty-state-text">Belum ada aset. Tambah properti, emas, saham, atau crypto untuk mulai melacak kekayaanmu.</div></div></div></div>'; return; }
+  el.innerHTML += '<div class="card mt-4"><div class="card-header"><div class="card-title">Alokasi Aset</div></div><div class="chart-canvas-wrap"><canvas class="chart-canvas" id="assetAllocChart"></canvas></div></div>';
+  el.innerHTML += '<div class="card mt-4"><div class="card-header"><div class="card-title">Daftar Aset</div></div><div class="card-body" id="assetList"></div></div>';
+  document.getElementById('assetList').innerHTML = assets.map(assetItemHTML).join('');
+  drawAssetAllocation('assetAllocChart', assets);
+}
+function assetItemHTML(a) {
+  const val = assetValue(a); const g = assetGain(a); const gp = assetGainPct(a); const gc = g >= 0 ? 'var(--success)' : 'var(--danger)';
+  const def = assetTypeDef(a.type);
+  const qtyStr = def.single ? '' : (Number(assetQty(a)).toLocaleString('id-ID') + ' ' + (a.unit || def.unit));
+  const liveBadge = (a.liveEnabled && (a.priceSource === 'crypto' || a.priceSource === 'gold')) ? '<span class="category-badge" style="color:var(--emerald-bright)">LIVE</span>' : '';
+  return '<div class="txn-item" onclick="editAsset(' + a.id + ')"><div class="txn-item-icon" style="color:var(--emerald-bright)">' + assetIcon(a.type) + '</div><div class="txn-item-body"><div class="txn-item-name">' + escapeHtml(a.name) + '</div><div class="txn-item-meta"><span class="category-badge">' + assetTypeLabel(a.type) + '</span>' + (qtyStr ? '<span>\u00b7 ' + qtyStr + '</span>' : '') + liveBadge + '</div></div><div style="text-align:right"><div class="txn-item-amount">' + formatRupiah(val) + '</div><div style="font-size:var(--fs-xs);color:' + gc + '">' + formatPct(gp) + ' \u00b7 ' + formatRupiahShort(g) + '</div></div></div>';
+}
+function drawAssetAllocation(canvasId, assets) {
+  const canvas = document.getElementById(canvasId); if (!canvas) return; const ctx = canvas.getContext('2d'); const dpr = window.devicePixelRatio || 1; const rect = canvas.getBoundingClientRect(); canvas.width = rect.width * dpr; canvas.height = rect.height * dpr; ctx.scale(dpr, dpr); ctx.clearRect(0, 0, rect.width, rect.height);
+  const sums = {}; assets.forEach(a => { const l = assetTypeLabel(a.type); sums[l] = (sums[l] || 0) + assetValue(a); }); const entries = Object.entries(sums).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+  if (entries.length === 0) { ctx.fillStyle = getCSSVar('--muted'); ctx.font = '13px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Belum ada data aset', rect.width / 2, rect.height / 2); return; }
+  const total = entries.reduce((s, [, v]) => s + v, 0); const cx = rect.width * 0.30, cy = rect.height / 2; const radius = Math.min(rect.width * 0.55, rect.height) / 2 * 0.82; let angle = -Math.PI / 2;
+  entries.forEach((e, i) => { const slice = (e[1] / total) * Math.PI * 2; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, radius, angle, angle + slice); ctx.closePath(); ctx.fillStyle = colorForIndex(i); ctx.fill(); angle += slice; });
+  ctx.beginPath(); ctx.fillStyle = getCSSVar('--bg-elev'); ctx.arc(cx, cy, radius * 0.56, 0, Math.PI * 2); ctx.fill();
+  let ly = 6; ctx.font = '11px sans-serif'; ctx.textAlign = 'left'; const lx = rect.width * 0.60;
+  entries.forEach((e, i) => { if (ly > rect.height - 16) return; ctx.fillStyle = colorForIndex(i); ctx.fillRect(lx, ly, 10, 10); ctx.fillStyle = getCSSVar('--fg-secondary'); const pct = ((e[1] / total) * 100).toFixed(0); let label = e[0]; if (label.length > 14) label = label.substring(0, 12) + '..'; ctx.fillText(label + ' (' + pct + '%)', lx + 16, ly + 9); ly += 18; });
+}
+function populateAssetSelects() {
+  const ts = document.getElementById('assetType'); ts.innerHTML = ASSET_TYPES.map(t => '<option value="' + t.key + '">' + t.label + '</option>').join('');
+  const cs = document.getElementById('assetCryptoSelect'); cs.innerHTML = CRYPTO_PRESETS.map(c => '<option value="' + c[1] + '">' + c[0] + '</option>').join('') + '<option value="__custom__">Lainnya (custom ID)</option>';
+}
+function onCryptoSelect() { const cs = document.getElementById('assetCryptoSelect'); document.getElementById('assetSymbol').style.display = cs.value === '__custom__' ? 'block' : 'none'; }
+function onAssetTypeChange() {
+  const type = document.getElementById('assetType').value; const def = assetTypeDef(type);
+  document.getElementById('assetSymbolGroup').style.display = type === 'crypto' ? 'block' : 'none';
+  document.getElementById('assetLiveGroup').style.display = def.live ? 'block' : 'none';
+  document.getElementById('assetQtyGroup').style.display = def.single ? 'none' : 'block';
+  document.getElementById('assetQtyLabel').textContent = 'Jumlah (' + def.unit + ')';
+  document.getElementById('assetBuyPriceLabel').textContent = def.single ? 'Nilai Perolehan (Rp)' : 'Harga Beli / ' + def.unit + ' (Rp)';
+  document.getElementById('assetCurPriceLabel').textContent = def.single ? 'Nilai Sekarang (Rp)' : 'Harga Sekarang / ' + def.unit + ' (Rp)';
+  const hint = document.getElementById('assetLiveHint');
+  if (type === 'crypto') hint.textContent = 'Harga diambil otomatis dari CoinGecko (IDR).';
+  else if (type === 'gold') hint.textContent = 'Harga emas per gram diambil otomatis (acuan PAX Gold, IDR).';
+  else hint.textContent = '';
+  if (type === 'crypto') onCryptoSelect();
+}
+function openAssetModal() {
+  editingAssetId = null; populateAssetSelects();
+  document.getElementById('assetModalTitle').textContent = 'Tambah Aset';
+  document.getElementById('assetId').value = ''; document.getElementById('assetType').value = 'gold';
+  document.getElementById('assetName').value = ''; document.getElementById('assetQty').value = ''; document.getElementById('assetBuyPrice').value = ''; document.getElementById('assetCurPrice').value = ''; document.getElementById('assetNotes').value = ''; document.getElementById('assetBuyDate').value = new Date().toISOString().split('T')[0]; document.getElementById('assetLive').checked = true; document.getElementById('assetSymbol').value = '';
+  document.getElementById('deleteAssetBtn').style.display = 'none';
+  onAssetTypeChange();
+  document.getElementById('assetModal').classList.add('active');
+}
+async function editAsset(id) {
+  try {
+    const a = await dbGet('assets', id); if (!a) return; editingAssetId = id; populateAssetSelects();
+    document.getElementById('assetModalTitle').textContent = 'Edit Aset';
+    document.getElementById('assetId').value = id; document.getElementById('assetType').value = a.type;
+    document.getElementById('assetName').value = a.name || ''; document.getElementById('assetQty').value = a.quantity || ''; document.getElementById('assetBuyPrice').value = a.buyPrice || ''; document.getElementById('assetCurPrice').value = a.currentPrice || ''; document.getElementById('assetNotes').value = a.notes || ''; document.getElementById('assetBuyDate').value = a.buyDate || new Date().toISOString().split('T')[0]; document.getElementById('assetLive').checked = a.liveEnabled !== false;
+    onAssetTypeChange();
+    if (a.type === 'crypto') { const cs = document.getElementById('assetCryptoSelect'); const known = CRYPTO_PRESETS.some(c => c[1] === a.symbol); if (known) { cs.value = a.symbol; document.getElementById('assetSymbol').style.display = 'none'; } else { cs.value = '__custom__'; document.getElementById('assetSymbol').style.display = 'block'; document.getElementById('assetSymbol').value = a.symbol || ''; } }
+    document.getElementById('deleteAssetBtn').style.display = 'inline-flex';
+    document.getElementById('assetModal').classList.add('active');
+  } catch (e) { console.error(e); }
+}
+function closeAssetModal() { document.getElementById('assetModal').classList.remove('active'); }
+async function saveAsset() {
+  const type = document.getElementById('assetType').value; const def = assetTypeDef(type);
+  const name = document.getElementById('assetName').value.trim(); if (!name) { alert('Nama aset wajib diisi'); return; }
+  const qty = def.single ? 1 : parseNumber(document.getElementById('assetQty').value);
+  if (!def.single && qty <= 0) { alert('Jumlah unit harus lebih dari 0'); return; }
+  const buyPrice = parseNumber(document.getElementById('assetBuyPrice').value);
+  let curPrice = parseNumber(document.getElementById('assetCurPrice').value); if (curPrice <= 0) curPrice = buyPrice;
+  let priceSource = 'manual', symbol = '';
+  if (type === 'crypto') { priceSource = 'crypto'; const cs = document.getElementById('assetCryptoSelect'); symbol = cs.value === '__custom__' ? document.getElementById('assetSymbol').value.trim().toLowerCase() : cs.value; }
+  else if (type === 'gold') { priceSource = 'gold'; symbol = 'pax-gold'; }
+  const liveEnabled = def.live ? document.getElementById('assetLive').checked : false;
+  const asset = { type, name, symbol, priceSource, quantity: qty, unit: def.unit, buyPrice, currentPrice: curPrice, buyDate: document.getElementById('assetBuyDate').value, liveEnabled, notes: document.getElementById('assetNotes').value.trim(), updatedAt: new Date().toISOString() };
+  try {
+    if (editingAssetId) { asset.id = editingAssetId; const prev = await dbGet('assets', editingAssetId); asset.createdAt = prev ? prev.createdAt : asset.updatedAt; asset.lastPriceUpdate = prev ? prev.lastPriceUpdate : null; await dbPut('assets', asset); }
+    else { asset.createdAt = asset.updatedAt; asset.lastPriceUpdate = null; await dbAdd('assets', asset); }
+    closeAssetModal(); await renderAssets();
+    if (liveEnabled) { await fetchLivePrices(true); await renderAssets(); }
+  } catch (e) { alert('Error menyimpan aset: ' + e.message); }
+}
+async function deleteAsset() { if (!editingAssetId) return; if (!confirm('Hapus aset ini?')) return; try { await dbDelete('assets', editingAssetId); closeAssetModal(); await renderAssets(); } catch (e) { alert('Error menghapus: ' + e.message); } }
+async function fetchLivePrices(showToast) {
+  const assets = await getAssets();
+  const liveAssets = assets.filter(a => a.liveEnabled && (a.priceSource === 'crypto' || a.priceSource === 'gold'));
+  if (liveAssets.length === 0) { if (showToast) assetToast('Belum ada aset live (crypto/emas) untuk di-update.'); return; }
+  const ids = new Set(); liveAssets.forEach(a => { if (a.priceSource === 'crypto' && a.symbol) ids.add(a.symbol); if (a.priceSource === 'gold') ids.add('pax-gold'); });
+  if (ids.size === 0) { if (showToast) assetToast('Tidak ada simbol valid untuk harga live.'); return; }
+  const url = 'https://api.coingecko.com/api/v3/simple/price?ids=' + [...ids].join(',') + '&vs_currencies=idr';
+  try {
+    const res = await fetch(url); if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json(); let updated = 0;
+    for (const a of liveAssets) {
+      let price = null;
+      if (a.priceSource === 'crypto' && data[a.symbol] && data[a.symbol].idr) price = data[a.symbol].idr;
+      else if (a.priceSource === 'gold' && data['pax-gold'] && data['pax-gold'].idr) price = data['pax-gold'].idr / GRAMS_PER_OZ;
+      if (price && price > 0) { a.currentPrice = price; a.lastPriceUpdate = new Date().toISOString(); await dbPut('assets', a); updated++; }
+    }
+    if (showToast) assetToast(updated > 0 ? ('Harga live diperbarui: ' + updated + ' aset.') : 'Tidak ada harga cocok dari sumber.');
+  } catch (e) { if (showToast) assetToast('Gagal ambil harga live (offline / diblokir browser). Pakai harga tersimpan.', true); }
+}
+async function refreshAssetPrices() { assetToast('Mengambil harga live...'); await fetchLivePrices(true); await renderAssets(); }
+
+/* ====== PAJAK — Fase 2: Konsultan Pajak (PPh 21, PTKP, PPN, NPWP) ====== */
+const PTKP_OPTIONS = [
+  { key: 'TK/0', label: 'TK/0 · Lajang, tanpa tanggungan', amount: 54000000 },
+  { key: 'TK/1', label: 'TK/1 · Lajang, 1 tanggungan', amount: 58500000 },
+  { key: 'TK/2', label: 'TK/2 · Lajang, 2 tanggungan', amount: 63000000 },
+  { key: 'TK/3', label: 'TK/3 · Lajang, 3 tanggungan', amount: 67500000 },
+  { key: 'K/0', label: 'K/0 · Menikah, tanpa tanggungan', amount: 58500000 },
+  { key: 'K/1', label: 'K/1 · Menikah, 1 tanggungan', amount: 63000000 },
+  { key: 'K/2', label: 'K/2 · Menikah, 2 tanggungan', amount: 67500000 },
+  { key: 'K/3', label: 'K/3 · Menikah, 3 tanggungan', amount: 72000000 },
+];
+const TAX_BRACKETS = [
+  { upTo: 60000000, rate: 0.05 },
+  { upTo: 250000000, rate: 0.15 },
+  { upTo: 500000000, rate: 0.25 },
+  { upTo: 5000000000, rate: 0.30 },
+  { upTo: Infinity, rate: 0.35 },
+];
+const INCOME_TYPE_OPTIONS = [
+  { key: 'employee', label: 'Karyawan / Pegawai (dapat biaya jabatan)' },
+  { key: 'freelance', label: 'Freelancer / Pekerja bebas' },
+  { key: 'business', label: 'Usaha / Bisnis' },
+];
+async function getTaxProfile() {
+  const p = await getSetting('taxProfile');
+  return Object.assign({ ptkpStatus: 'TK/0', hasNPWP: true, incomeType: 'employee', useAutoIncome: true, manualAnnualIncome: 0, ppnRate: 11, ppnBase: 0 }, p || {});
+}
+async function saveTaxProfile(p) { await saveSetting('taxProfile', p); }
+function ptkpAmount(key) { const o = PTKP_OPTIONS.find(x => x.key === key); return o ? o.amount : 54000000; }
+function calcPph21(grossAnnual, ptkpStatus, incomeType, hasNPWP) {
+  grossAnnual = Math.max(0, grossAnnual || 0);
+  let biayaJabatan = 0;
+  if (incomeType === 'employee') biayaJabatan = Math.min(grossAnnual * 0.05, 6000000);
+  const netAnnual = Math.max(0, grossAnnual - biayaJabatan);
+  const ptkp = ptkpAmount(ptkpStatus);
+  let pkp = Math.max(0, netAnnual - ptkp);
+  pkp = Math.floor(pkp / 1000) * 1000;
+  const breakdown = []; let remaining = pkp; let prev = 0; let baseTax = 0;
+  for (const b of TAX_BRACKETS) {
+    if (remaining <= 0) break;
+    const span = b.upTo - prev;
+    const taxable = Math.min(remaining, span);
+    if (taxable > 0) { const t = taxable * b.rate; breakdown.push({ from: prev, to: prev + taxable, rate: b.rate, taxable, tax: t }); baseTax += t; }
+    remaining -= taxable; prev = b.upTo;
+  }
+  const surcharge = hasNPWP ? 0 : baseTax * 0.20;
+  const totalTax = baseTax + surcharge;
+  return { grossAnnual, biayaJabatan, netAnnual, ptkp, pkp, breakdown, baseTax, surcharge, totalTax, monthlyTax: totalTax / 12, effectiveRate: grossAnnual > 0 ? (totalTax / grossAnnual) * 100 : 0, takeHome: grossAnnual - totalTax };
+}
+async function getAnnualIncomeEstimate() {
+  const year = currentYear; let total = 0; const months = currentMonth + 1;
+  for (let m = 0; m <= currentMonth; m++) { const txns = await getTransactions(monthKey(year, m)); total += sumByType(txns, 'income'); }
+  const avg = months > 0 ? total / months : 0;
+  return { ytdIncome: total, monthsElapsed: months, avgMonthly: avg, annualized: avg * 12 };
+}
+function taxRow(label, value, kind, valueId) {
+  const cls = kind === 'plus' ? 'cashflow-row plus' : kind === 'total' ? 'cashflow-row total' : 'cashflow-row minus';
+  return '<div class="' + cls + '"><div class="cashflow-left"><span class="cashflow-label">' + label + '</span></div><div class="cashflow-right"' + (valueId ? ' id="' + valueId + '"' : '') + '>' + value + '</div></div>';
+}
+async function renderTax() {
+  const el = document.getElementById('tab-tax');
+  const profile = await getTaxProfile();
+  const est = await getAnnualIncomeEstimate();
+  const grossAnnual = profile.useAutoIncome ? est.annualized : parseNumber(profile.manualAnnualIncome);
+  const r = calcPph21(grossAnnual, profile.ptkpStatus, profile.incomeType, profile.hasNPWP);
+  let html = '';
+  html += '<div class="hero-card" style="background:linear-gradient(135deg,#0d9488 0%,#0891b2 100%)"><div class="hero-label">Estimasi PPh 21 Setahun</div><div class="hero-value">' + formatRupiah(r.totalTax) + '</div><div class="hero-sub"><div class="hero-sub-item"><div class="hero-sub-label">Per Bulan</div><div class="hero-sub-value">' + formatRupiahShort(r.monthlyTax) + '</div></div><div class="hero-sub-item"><div class="hero-sub-label">Tarif Efektif</div><div class="hero-sub-value">' + r.effectiveRate.toFixed(1) + '%</div></div><div class="hero-sub-item"><div class="hero-sub-label">Take Home</div><div class="hero-sub-value">' + formatRupiahShort(r.takeHome) + '</div></div></div></div>';
+  html += '<div class="card mt-4" style="border-color:var(--border-strong)"><div class="card-body" style="display:flex;gap:var(--sp-3);align-items:flex-start"><span style="font-size:18px">ℹ️</span><div class="text-muted" style="font-size:var(--fs-xs);line-height:1.5">Estimasi memakai aturan <strong>UU HPP 2022</strong> (PTKP, tarif progresif, biaya jabatan). Ini perkiraan — untuk pelaporan resmi tetap gunakan e-Filing DJP atau konsultan pajak tersertifikasi.</div></div></div>';
+  html += '<div class="card mt-4"><div class="card-header"><div class="card-title">Profil Pajak</div></div><div class="card-body">';
+  html += '<div class="form-group"><label class="form-label">Status PTKP</label><select class="form-select" id="taxPtkp" onchange="onTaxProfileChange()">' + PTKP_OPTIONS.map(o => '<option value="' + o.key + '"' + (o.key === profile.ptkpStatus ? ' selected' : '') + '>' + o.label + ' (' + formatRupiahShort(o.amount) + ')</option>').join('') + '</select></div>';
+  html += '<div class="form-group"><label class="form-label">Jenis Penghasilan</label><select class="form-select" id="taxIncomeType" onchange="onTaxProfileChange()">' + INCOME_TYPE_OPTIONS.map(o => '<option value="' + o.key + '"' + (o.key === profile.incomeType ? ' selected' : '') + '>' + o.label + '</option>').join('') + '</select></div>';
+  html += '<div class="form-row"><div class="form-group"><label class="form-label">Punya NPWP?</label><select class="form-select" id="taxNPWP" onchange="onTaxProfileChange()"><option value="yes"' + (profile.hasNPWP ? ' selected' : '') + '>Ya</option><option value="no"' + (!profile.hasNPWP ? ' selected' : '') + '>Tidak (+20%)</option></select></div><div class="form-group"><label class="form-label">Sumber Penghasilan</label><select class="form-select" id="taxIncomeMode" onchange="onTaxProfileChange()"><option value="auto"' + (profile.useAutoIncome ? ' selected' : '') + '>Otomatis (dari transaksi)</option><option value="manual"' + (!profile.useAutoIncome ? ' selected' : '') + '>Input manual</option></select></div></div>';
+  if (profile.useAutoIncome) { html += '<div class="text-muted" style="font-size:var(--fs-xs)">Bruto disetahunkan dari rata-rata income ' + est.monthsElapsed + ' bulan (' + formatRupiahShort(est.avgMonthly) + '/bln × 12).</div>'; }
+  else { html += '<div class="form-group"><label class="form-label">Penghasilan Bruto Setahun (Rp)</label><input type="number" class="form-input" id="taxManualIncome" value="' + (profile.manualAnnualIncome || '') + '" placeholder="0" min="0" step="1000000" onchange="onTaxProfileChange()"></div>'; }
+  html += '</div></div>';
+  html += '<div class="card mt-4"><div class="card-header"><div class="card-title">Perhitungan PPh 21</div></div><div class="card-body"><div class="cashflow-grid">';
+  html += taxRow('Penghasilan Bruto Setahun', formatRupiah(r.grossAnnual), 'plus');
+  if (r.biayaJabatan > 0) html += taxRow('Biaya Jabatan (5%, maks 6 jt)', '− ' + formatRupiah(r.biayaJabatan), 'minus');
+  html += taxRow('PTKP (' + profile.ptkpStatus + ')', '− ' + formatRupiah(r.ptkp), 'minus');
+  html += taxRow('Penghasilan Kena Pajak (PKP)', formatRupiah(r.pkp), 'total');
+  html += '</div>';
+  if (r.breakdown.length > 0) {
+    html += '<div style="overflow-x:auto;margin-top:var(--sp-4)"><table class="summary-table"><thead><tr><th>Lapisan PKP</th><th class="text-right">Tarif</th><th class="text-right">Dasar</th><th class="text-right">Pajak</th></tr></thead><tbody>';
+    html += r.breakdown.map(b => '<tr><td>' + formatRupiahShort(b.from) + ' – ' + formatRupiahShort(b.to) + '</td><td class="text-right">' + Math.round(b.rate * 100) + '%</td><td class="text-right">' + formatRupiahShort(b.taxable) + '</td><td class="text-right fw-bold">' + formatRupiahShort(b.tax) + '</td></tr>').join('');
+    html += '</tbody><tfoot><tr><td colspan="3">PPh 21 Pokok</td><td class="text-right">' + formatRupiahShort(r.baseTax) + '</td></tr>';
+    if (r.surcharge > 0) html += '<tr><td colspan="3">Tambahan tanpa NPWP (+20%)</td><td class="text-right text-danger">' + formatRupiahShort(r.surcharge) + '</td></tr>';
+    html += '<tr><td colspan="3">Total Pajak Setahun</td><td class="text-right">' + formatRupiahShort(r.totalTax) + '</td></tr></tfoot></table></div>';
+  } else {
+    html += '<div class="empty-state" style="padding:var(--sp-4)"><div class="empty-state-text">PKP kamu Rp 0 — penghasilan di bawah PTKP, jadi tidak ada PPh 21 terutang. 🎉</div></div>';
+  }
+  html += '</div></div>';
+  const ppn = (profile.ppnBase || 0) * ((profile.ppnRate || 11) / 100);
+  html += '<div class="card mt-4"><div class="card-header"><div class="card-title">Kalkulator PPN</div></div><div class="card-body">';
+  html += '<div class="form-row"><div class="form-group"><label class="form-label">Dasar Pengenaan (DPP, Rp)</label><input type="number" class="form-input" id="ppnBase" value="' + (profile.ppnBase || '') + '" placeholder="0" min="0" step="1000" oninput="onPpnChange()"></div><div class="form-group"><label class="form-label">Tarif PPN</label><select class="form-select" id="ppnRate" onchange="onPpnChange()"><option value="11"' + (profile.ppnRate === 11 ? ' selected' : '') + '>11% (umum)</option><option value="12"' + (profile.ppnRate === 12 ? ' selected' : '') + '>12% (barang mewah)</option></select></div></div>';
+  html += '<div class="cashflow-grid">' + taxRow('PPN', formatRupiah(ppn), 'minus', 'ppnResult') + taxRow('Total + PPN', formatRupiah((profile.ppnBase || 0) + ppn), 'total', 'ppnTotal') + '</div>';
+  html += '</div></div>';
+  el.innerHTML = html;
+}
+async function onTaxProfileChange() {
+  const profile = await getTaxProfile();
+  const ptkpEl = document.getElementById('taxPtkp'); if (ptkpEl) profile.ptkpStatus = ptkpEl.value;
+  const itEl = document.getElementById('taxIncomeType'); if (itEl) profile.incomeType = itEl.value;
+  const npwpEl = document.getElementById('taxNPWP'); if (npwpEl) profile.hasNPWP = npwpEl.value === 'yes';
+  const modeEl = document.getElementById('taxIncomeMode'); if (modeEl) profile.useAutoIncome = modeEl.value === 'auto';
+  const miEl = document.getElementById('taxManualIncome'); if (miEl) profile.manualAnnualIncome = parseNumber(miEl.value);
+  await saveTaxProfile(profile);
+  await renderTax();
+}
+async function onPpnChange() {
+  const profile = await getTaxProfile();
+  const baseEl = document.getElementById('ppnBase'); const rateEl = document.getElementById('ppnRate');
+  if (baseEl) profile.ppnBase = parseNumber(baseEl.value);
+  if (rateEl) profile.ppnRate = parseNumber(rateEl.value);
+  await saveTaxProfile(profile);
+  const ppn = profile.ppnBase * (profile.ppnRate / 100);
+  const rEl = document.getElementById('ppnResult'); if (rEl) rEl.textContent = formatRupiah(ppn);
+  const tEl = document.getElementById('ppnTotal'); if (tEl) tEl.textContent = formatRupiah(profile.ppnBase + ppn);
+}
+
+/* ====== SEED DATA ====== */
+async function seedData() {
+  const seeded = await getSetting('seeded'); if (seeded) return;
+  const mk = currentMonthKey(); const today = new Date().toISOString().split('T')[0]; const dayAgo = new Date(Date.now() - 86400000).toISOString().split('T')[0]; const twoDaysAgo = new Date(Date.now() - 2*86400000).toISOString().split('T')[0];
+  const seeds = [
+    { type: 'income', category: 'Paycheck', amount: 12000000, date: today, description: 'Gaji bulanan', monthKey: mk, createdAt: new Date().toISOString() },
+    { type: 'expense', category: 'Food', amount: 75000, date: today, description: 'Makan siang', monthKey: mk, createdAt: new Date().toISOString() },
+    { type: 'expense', category: 'Transportation', amount: 50000, date: today, description: 'Ojek online', monthKey: mk, createdAt: new Date().toISOString() },
+    { type: 'expense', category: 'Food', amount: 45000, date: dayAgo, description: 'Groceries', monthKey: mk, createdAt: new Date().toISOString() },
+    { type: 'bill', category: 'Netflix', amount: 53000, date: dayAgo, description: 'Netflix monthly', monthKey: mk, createdAt: new Date().toISOString() },
+    { type: 'savings', category: 'Travel Fund', amount: 500000, date: twoDaysAgo, description: 'Tabungan awal', monthKey: mk, createdAt: new Date().toISOString() },
+    { type: 'debt', category: 'BCA', amount: 800000, date: twoDaysAgo, description: 'Cicilan kartu kredit', monthKey: mk, createdAt: new Date().toISOString() }
+  ];
+  for (const s of seeds) { await dbAdd('transactions', s); }
+  const budget = { monthKey: mk }; budget['income_Paycheck'] = 12000000; budget['expense_Food'] = 1200000; budget['expense_Transportation'] = 70000; budget['expense_Household'] = 100000; budget['expense_Beauty'] = 50000; budget['bill_Netflix'] = 37000; budget['bill_House Rent'] = 700000; budget['debt_BCA'] = 800000;
+  await saveBudget(budget);
+  await dbAdd('savingsGoals', { name: 'Travel Fund', target: 5000000, totalSaved: 500000 });
+  await dbAdd('savingsGoals', { name: 'Wedding Fund', target: 10000000, totalSaved: 0 });
+  const nowISO = new Date().toISOString();
+  await dbAdd('assets', { type: 'gold', name: 'Emas Antam', symbol: 'pax-gold', priceSource: 'gold', quantity: 10, unit: 'gram', buyPrice: 1050000, currentPrice: 1180000, buyDate: today, liveEnabled: true, notes: 'Logam mulia batangan', createdAt: nowISO, updatedAt: nowISO, lastPriceUpdate: null });
+  await dbAdd('assets', { type: 'crypto', name: 'Bitcoin', symbol: 'bitcoin', priceSource: 'crypto', quantity: 0.05, unit: 'koin', buyPrice: 900000000, currentPrice: 1050000000, buyDate: today, liveEnabled: true, notes: '', createdAt: nowISO, updatedAt: nowISO, lastPriceUpdate: null });
+  await dbAdd('assets', { type: 'property', name: 'Rumah Bekasi', symbol: '', priceSource: 'manual', quantity: 1, unit: 'unit', buyPrice: 450000000, currentPrice: 620000000, buyDate: today, liveEnabled: false, notes: 'SHM', createdAt: nowISO, updatedAt: nowISO, lastPriceUpdate: null });
+  await saveSetting('seeded', true);
+}
+
+/* ====== THEME ====== */
+async function toggleTheme() { const c = document.documentElement.dataset.theme || 'dark'; const n = c === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = n; await saveSetting('theme', n); if (currentTab) renderTab(currentTab); }
+async function loadTheme() { const theme = await getSetting('theme') || 'dark'; document.documentElement.dataset.theme = theme; }
+async function renderMonthLabel() { document.getElementById('monthLabel').textContent = MONTH_NAMES[currentMonth] + ' ' + currentYear; }
+function prevMonth() { currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } renderMonthLabel(); switchTab(currentTab); }
+function nextMonth() { currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } renderMonthLabel(); switchTab(currentTab); }
+
+/* ====== SERVICE WORKER ====== */
+if ('serviceWorker' in navigator) {
+  const swCode = 'const C="vaultin-v2";self.addEventListener("install",e=>self.skipWaiting());self.addEventListener("activate",e=>e.waitUntil(self.clients.claim()));self.addEventListener("fetch",e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res&&res.status===200&&e.request.method==="GET"){const c=res.clone();caches.open(C).then(ca=>ca.put(e.request,c))}return res}).catch(()=>caches.match(e.request))))});';
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+
+/* ====== EVENT LISTENERS ====== */
+function initEvents() {
+  document.querySelectorAll('.tab').forEach(el => el.addEventListener('click', () => switchTab(el.dataset.tab)));
+  document.querySelectorAll('.bottom-nav-item').forEach(el => el.addEventListener('click', () => switchTab(el.dataset.tab)));
+  document.getElementById('prevMonth').addEventListener('click', prevMonth);
+  document.getElementById('nextMonth').addEventListener('click', nextMonth);
+  document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+  document.getElementById('exportBtn').addEventListener('click', exportData);
+  document.getElementById('importFile').addEventListener('change', e => { if (e.target.files[0]) importData(e.target.files[0]); e.target.value = ''; });
+  document.getElementById('fabAdd').addEventListener('click', () => { if (currentTab === 'asset') openAssetModal(); else openTxnModal(); });
+  document.getElementById('fabScan').addEventListener('click', openScanModal);
+  document.getElementById('closeTxnModal').addEventListener('click', closeTxnModal);
+  document.getElementById('cancelTxnBtn').addEventListener('click', closeTxnModal);
+  document.getElementById('saveTxnBtn').addEventListener('click', saveTxn);
+  document.getElementById('deleteTxnBtn').addEventListener('click', deleteTxn);
+  document.getElementById('txnModal').addEventListener('click', e => { if (e.target.id === 'txnModal') closeTxnModal(); });
+  ['Expense','Income','Bill','Debt','Savings'].forEach(t => { document.getElementById('type' + t).addEventListener('click', () => { selectedTxnType = t.toLowerCase(); updateTxnTypeButtons(); populateCategoryDropdown(); }); });
+  document.getElementById('closeBudgetModal').addEventListener('click', closeBudgetModal);
+  document.getElementById('cancelBudgetBtn').addEventListener('click', closeBudgetModal);
+  document.getElementById('saveBudgetBtn').addEventListener('click', saveBudgetData);
+  document.getElementById('budgetModal').addEventListener('click', e => { if (e.target.id === 'budgetModal') closeBudgetModal(); });
+  document.getElementById('closeScanModal').addEventListener('click', closeScanModal);
+  document.getElementById('cancelScanBtn').addEventListener('click', closeScanModal);
+  document.getElementById('saveScanBtn').addEventListener('click', saveScanTxn);
+  document.getElementById('scanModal').addEventListener('click', e => { if (e.target.id === 'scanModal') closeScanModal(); });
+  document.getElementById('scanPreview').addEventListener('click', () => { const inp = document.getElementById('scanFileInput'); if (inp) inp.click(); });
+  document.getElementById('scanFileInput').addEventListener('change', handleScanFile);
+  document.getElementById('scanCategoryManual').addEventListener('change', e => { if (e.target.value) { const parts = e.target.value.split('|'); scanSelectedCategory = parts[0]; scanSelectedType = parts[1]; } });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeTxnModal(); closeBudgetModal(); closeScanModal(); closeAssetModal(); } });
+  let resizeTimer; window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (!document.getElementById('tab-' + currentTab).classList.contains('hidden')) renderTab(currentTab); }, 200); });
+}
+
+/* ====== INIT ====== */
+async function init() { await openDB(); await loadTheme(); await seedData(); initEvents(); await renderMonthLabel(); await switchTab('dashboard'); }
+init();
+</script>
+</body>
+</html>
