@@ -1029,11 +1029,11 @@ async function saveSavingsGoal(category, idx) {
 }
 
 /* ====== EXPORT / IMPORT ====== */
-async function exportData() { const txns = await dbGetAll('transactions'); const budgets = await dbGetAll('budgets'); const goals = await dbGetAll('savingsGoals'); const data = { version: 2, app: 'Vaultin', exportedAt: new Date().toISOString(), transactions: txns, budgets, savingsGoals: goals }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'vaultin-export-' + new Date().toISOString().split('T')[0] + '.json'; a.click(); URL.revokeObjectURL(url); }
-async function importData(file) { try { const text = await file.text(); if (file.name.endsWith('.json')) { const data = JSON.parse(text); if (!data.transactions) { alert('Format tidak valid'); return; } if (confirm('Import akan menambah data ke yang ada. Lanjutkan?')) { for (const t of data.transactions) { await dbPut('transactions', t); } for (const b of data.budgets||[]) { await dbPut('budgets', b); } for (const g of data.savingsGoals||[]) { await dbPut('savingsGoals', g); } alert('Data berhasil diimport!'); await renderTab(currentTab); } } else if (file.name.endsWith('.csv')) { const lines = text.split('\n').filter(l => l.trim()); for (let i = 1; i < lines.length; i++) { const vals = lines[i].match(/("[^"]*")|[^,]+/g); if (!vals || vals.length < 5) continue; const cv = v => v.replace(/^"|"$/g,'').replace(/""/g,'"'); const d = new Date(vals[4]); await dbAdd('transactions', { type: cv(vals[1]), category: cv(vals[2]), amount: parseNumber(vals[3]), date: vals[4], description: vals[5]?cv(vals[5]):'', monthKey: monthKey(d.getFullYear(), d.getMonth()), createdAt: new Date().toISOString() }); } alert('CSV berhasil diimport!'); await renderTab(currentTab); } } catch(e) { alert('Error importing: ' + e.message); } }
+async function exportData() { const [txns, budgets, goals, assets, settings] = await Promise.all([dbGetAll('transactions'), dbGetAll('budgets'), dbGetAll('savingsGoals'), dbGetAll('assets'), dbGetAll('settings')]); const data = { version: 3, app: 'Vaultin', exportedAt: new Date().toISOString(), transactions: txns, budgets, savingsGoals: goals, assets, settings }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'vaultin-backup-' + new Date().toISOString().split('T')[0] + '.json'; a.click(); URL.revokeObjectURL(url); }
+async function importData(file) { try { const text = await file.text(); if (file.name.endsWith('.json')) { const data = JSON.parse(text); if (!data.transactions) { alert('Format tidak valid'); return; } if (confirm('Import akan menambah data ke yang ada. Lanjutkan?')) { for (const t of data.transactions) { await dbPut('transactions', t); } for (const b of data.budgets||[]) { await dbPut('budgets', b); } for (const g of data.savingsGoals||[]) { await dbPut('savingsGoals', g); } for (const a of data.assets||[]) { await dbPut('assets', a); } for (const s of data.settings||[]) { await dbPut('settings', s); } alert('Data berhasil diimport!'); if (typeof loadTheme === 'function') await loadTheme(); await renderTab(currentTab); } } else if (file.name.endsWith('.csv')) { const lines = text.split('\n').filter(l => l.trim()); for (let i = 1; i < lines.length; i++) { const vals = lines[i].match(/("[^"]*")|[^,]+/g); if (!vals || vals.length < 5) continue; const cv = v => v.replace(/^"|"$/g,'').replace(/""/g,'"'); const d = new Date(vals[4]); await dbAdd('transactions', { type: cv(vals[1]), category: cv(vals[2]), amount: parseNumber(vals[3]), date: vals[4], description: vals[5]?cv(vals[5]):'', monthKey: monthKey(d.getFullYear(), d.getMonth()), createdAt: new Date().toISOString() }); } alert('CSV berhasil diimport!'); await renderTab(currentTab); } } catch(e) { alert('Error importing: ' + e.message); } }
 
 /* ====== SCAN STRUK (OCR) ====== */
-function openScanModal() { resetScanModal(); document.getElementById('scanDate').value = new Date().toISOString().split('T')[0]; document.getElementById('scanModal').classList.add('active'); }
+function openScanModal() { resetScanModal(); preloadOcrWorker(); document.getElementById('scanDate').value = new Date().toISOString().split('T')[0]; document.getElementById('scanModal').classList.add('active'); }
 function closeScanModal() { document.getElementById('scanModal').classList.remove('active'); }
 function resetScanModal() {
   const preview = document.getElementById('scanPreview');
@@ -1057,13 +1057,31 @@ function handleScanFile(e) {
   };
   reader.readAsDataURL(file);
 }
+let ocrWorker = null, ocrWorkerPromise = null, ocrProgressCb = null;
+async function getOcrWorker() {
+  if (ocrWorker) return ocrWorker;
+  if (ocrWorkerPromise) return ocrWorkerPromise;
+  ocrWorkerPromise = (async () => {
+    const worker = await Tesseract.createWorker('ind+eng', 1, { logger: m => { if (ocrProgressCb) ocrProgressCb(m); } });
+    try { await worker.setParameters({ tessedit_pageseg_mode: '6', preserve_interword_spaces: '1' }); } catch (_) {}
+    ocrWorker = worker;
+    return worker;
+  })();
+  return ocrWorkerPromise;
+}
+function preloadOcrWorker() { try { getOcrWorker(); } catch (_) {} }
 async function processScanOCR(imageDataUrl, fileName) {
   const statusEl = document.getElementById('scanStatus');
   statusEl.style.display = 'flex'; statusEl.innerHTML = '<div class="spinner"></div><div>Memindai struk... Tunggu sebentar</div>';
   document.getElementById('scanResult').style.display = 'none'; document.getElementById('scanForm').style.display = 'none'; document.getElementById('saveScanBtn').disabled = true;
   try {
+    statusEl.innerHTML = '<div class="spinner"></div><div>Menyiapkan mesin OCR...</div>';
+    const worker = await getOcrWorker();
+    statusEl.innerHTML = '<div class="spinner"></div><div>Mengoptimalkan gambar...</div>';
     const processedImage = await preprocessImage(imageDataUrl);
-    const result = await Tesseract.recognize(processedImage, 'ind+eng', { logger: m => { if (m.status === 'recognizing text') { statusEl.innerHTML = '<div class="spinner"></div><div>Membaca teks... ' + Math.round(m.progress * 100) + '%</div>'; } } });
+    ocrProgressCb = m => { if (m.status === 'recognizing text') { statusEl.innerHTML = '<div class="spinner"></div><div>Membaca teks... ' + Math.round(m.progress * 100) + '%</div>'; } };
+    const result = await worker.recognize(processedImage);
+    ocrProgressCb = null;
     const rawText = result.data.text || '';
     statusEl.innerHTML = '<div style="font-size:18px">OK</div><div>Scan selesai! Menganalisis...</div>';
     const parsed = parseReceiptText(rawText);
@@ -1085,11 +1103,38 @@ async function processScanOCR(imageDataUrl, fileName) {
     } else { guessEl.innerHTML = '<div class="text-muted" style="font-size:var(--fs-sm)">Tidak ada tebakan kategori. Pilih manual di bawah.</div>'; }
     document.getElementById('scanForm').style.display = 'block'; document.getElementById('saveScanBtn').disabled = false;
   } catch (err) {
+    ocrProgressCb = null;
     statusEl.style.display = 'none'; const resultEl = document.getElementById('scanResult'); resultEl.style.display = 'block'; resultEl.innerHTML = '<div style="padding:var(--sp-4);text-align:center"><div style="font-size:20px;margin-bottom:var(--sp-2)">OCR gagal</div><div style="font-size:var(--fs-sm);color:var(--muted);margin-top:var(--sp-2)">Kamu bisa input manual di bawah.</div></div>';
     document.getElementById('scanForm').style.display = 'block'; document.getElementById('saveScanBtn').disabled = false;
   }
 }
-async function preprocessImage(dataUrl) { return new Promise((resolve) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const maxW = 1200; let w = img.width, h = img.height; if (w > maxW) { h = (h * maxW) / w; w = maxW; } canvas.width = w; canvas.height = h; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h); const imgData = ctx.getImageData(0, 0, w, h); const d = imgData.data; const contrast = 1.5; const intercept = 128 * (1 - contrast); for (let i = 0; i < d.length; i += 4) { let g = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2]; g = g * contrast + intercept; g = Math.max(0, Math.min(255, g)); d[i] = d[i+1] = d[i+2] = g; } ctx.putImageData(imgData, 0, 0); resolve(canvas.toDataURL('image/png')); }; img.onerror = () => resolve(dataUrl); img.src = dataUrl; }); }
+async function preprocessImage(dataUrl) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      const maxW = 1600, minW = 1000;
+      let scale = 1;
+      if (w > maxW) scale = maxW / w; else if (w < minW) scale = Math.min(minW / w, 2.5);
+      w = Math.round(w * scale); h = Math.round(h * scale);
+      const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      ctx.drawImage(img, 0, 0, w, h);
+      const imgData = ctx.getImageData(0, 0, w, h); const d = imgData.data;
+      const hist = new Array(256).fill(0); const gray = new Uint8ClampedArray(d.length / 4);
+      for (let i = 0, j = 0; i < d.length; i += 4, j++) { const g = (0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2]) | 0; gray[j] = g; hist[g]++; }
+      const total = gray.length; let sum = 0; for (let t = 0; t < 256; t++) sum += t * hist[t];
+      let sumB = 0, wB = 0, maxVar = 0, threshold = 128;
+      for (let t = 0; t < 256; t++) { wB += hist[t]; if (wB === 0) continue; const wF = total - wB; if (wF === 0) break; sumB += t * hist[t]; const mB = sumB / wB; const mF = (sum - sumB) / wF; const between = wB * wF * (mB - mF) * (mB - mF); if (between > maxVar) { maxVar = between; threshold = t; } }
+      const th = threshold + 8;
+      for (let i = 0, j = 0; i < d.length; i += 4, j++) { const v = gray[j] < th ? 0 : 255; d[i] = d[i+1] = d[i+2] = v; }
+      ctx.putImageData(imgData, 0, 0);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
 function parseReceiptText(text) {
   const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
   const allText = lines.join(' ').toLowerCase();
