@@ -569,6 +569,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
     <button class="tab" data-tab="ytd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>YTD</button>
     <button class="tab" data-tab="asset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Aset</button>
     <button class="tab" data-tab="tax"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>Pajak</button>
+    <button class="tab" data-tab="zakat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>Zakat</button>
   </nav>
 
   <!-- MAIN CONTENT -->
@@ -582,6 +583,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
     <div id="tab-ytd" class="tab-content hidden"></div>
     <div id="tab-asset" class="tab-content hidden"></div>
     <div id="tab-tax" class="tab-content hidden"></div>
+    <div id="tab-zakat" class="tab-content hidden"></div>
   </main>
 
   <!-- FAB -->
@@ -879,7 +881,7 @@ async function getRollover(monthK) { const [y, m] = monthK.split('-').map(Number
 
 /* ====== RENDERING ====== */
 async function switchTab(tab) { currentTab = tab; document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden')); document.getElementById('tab-' + tab).classList.remove('hidden'); document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.dataset.tab === tab)); document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.toggle('active', el.dataset.tab === tab)); await renderTab(tab); }
-async function renderTab(tab) { switch(tab) { case 'dashboard': await renderDashboard(); break; case 'income': await renderCategoryTab('income', 'Income', INCOME_CATS); break; case 'expense': await renderCategoryTab('expense', 'Expense', EXPENSE_CATS); break; case 'bills': await renderCategoryTab('bill', 'Bills', BILL_CATS); break; case 'debt': await renderCategoryTab('debt', 'Debt', DEBT_CATS); break; case 'savings': await renderSavings(); break; case 'ytd': await renderYTD(); break; case 'asset': await renderAssets(); break; case 'tax': await renderTax(); break; } }
+async function renderTab(tab) { switch(tab) { case 'dashboard': await renderDashboard(); break; case 'income': await renderCategoryTab('income', 'Income', INCOME_CATS); break; case 'expense': await renderCategoryTab('expense', 'Expense', EXPENSE_CATS); break; case 'bills': await renderCategoryTab('bill', 'Bills', BILL_CATS); break; case 'debt': await renderCategoryTab('debt', 'Debt', DEBT_CATS); break; case 'savings': await renderSavings(); break; case 'ytd': await renderYTD(); break; case 'asset': await renderAssets(); break; case 'tax': await renderTax(); break; case 'zakat': await renderZakat(); break; } }
 
 async function renderDashboard() {
   const monthK = currentMonthKey(); const txns = await getTransactions(monthK); const budget = await getBudget(monthK); const rollover = await getRollover(monthK);
@@ -1389,6 +1391,84 @@ async function onPpnChange() {
   const ppn = profile.ppnBase * (profile.ppnRate / 100);
   const rEl = document.getElementById('ppnResult'); if (rEl) rEl.textContent = formatRupiah(ppn);
   const tEl = document.getElementById('ppnTotal'); if (tEl) tEl.textContent = formatRupiah(profile.ppnBase + ppn);
+}
+
+/* ====== ZAKAT — Fase 3: Konsultan Zakat ====== */
+const NISAB_GOLD_GRAM = 85;
+const ZAKAT_RATE = 0.025;
+async function getZakatProfile() {
+  const p = await getSetting('zakatProfile');
+  return Object.assign({ goldPricePerGram: 1350000, useAutoIncome: true, manualMonthlyIncome: 0, haulMet: true, extraCash: 0 }, p || {});
+}
+async function saveZakatProfile(p) { await saveSetting('zakatProfile', p); }
+async function getZakatAssets() {
+  const assets = await getAssets();
+  let gold = 0, cash = 0, invest = 0, piutang = 0;
+  assets.forEach(a => { const v = assetValue(a); if (a.type === 'gold') gold += v; else if (a.type === 'deposito') cash += v; else if (a.type === 'stock' || a.type === 'crypto' || a.type === 'reksadana') invest += v; else if (a.type === 'piutang') piutang += v; });
+  return { gold, cash, invest, piutang };
+}
+async function detectGoldPrice() {
+  const assets = await getAssets();
+  const golds = assets.filter(a => a.type === 'gold' && assetUnitPrice(a) > 0);
+  return golds.length ? assetUnitPrice(golds[0]) : 0;
+}
+async function renderZakat() {
+  const el = document.getElementById('tab-zakat');
+  const profile = await getZakatProfile();
+  const za = await getZakatAssets();
+  const detected = await detectGoldPrice();
+  const goldPrice = parseNumber(profile.goldPricePerGram) > 0 ? parseNumber(profile.goldPricePerGram) : (detected > 0 ? detected : 1350000);
+  const nisab = NISAB_GOLD_GRAM * goldPrice;
+  const extraCash = parseNumber(profile.extraCash);
+  const totalCash = za.cash + extraCash;
+  const totalHarta = za.gold + totalCash + za.invest + za.piutang;
+  const reachNisab = totalHarta >= nisab;
+  const zakatMal = (reachNisab && profile.haulMet) ? totalHarta * ZAKAT_RATE : 0;
+  const est = await getAnnualIncomeEstimate();
+  const annualIncome = profile.useAutoIncome ? est.annualized : parseNumber(profile.manualMonthlyIncome) * 12;
+  const incomeReachNisab = annualIncome >= nisab;
+  const zakatIncomeYear = incomeReachNisab ? annualIncome * ZAKAT_RATE : 0;
+  const zakatIncomeMonth = zakatIncomeYear / 12;
+  const totalZakatYear = zakatMal + zakatIncomeYear;
+  let html = '';
+  html += '<div class="hero-card" style="background:linear-gradient(135deg,#059669 0%,#0d9488 100%)"><div class="hero-label">Estimasi Zakat Wajib Setahun</div><div class="hero-value">' + formatRupiah(totalZakatYear) + '</div><div class="hero-sub"><div class="hero-sub-item"><div class="hero-sub-label">Zakat Mal</div><div class="hero-sub-value">' + formatRupiahShort(zakatMal) + '</div></div><div class="hero-sub-item"><div class="hero-sub-label">Zakat Penghasilan</div><div class="hero-sub-value">' + formatRupiahShort(zakatIncomeYear) + '</div></div><div class="hero-sub-item"><div class="hero-sub-label">Per Bulan</div><div class="hero-sub-value">' + formatRupiahShort(totalZakatYear / 12) + '</div></div></div></div>';
+  html += '<div class="card mt-4" style="border-color:var(--border-strong)"><div class="card-body" style="display:flex;gap:var(--sp-3);align-items:flex-start"><span style="font-size:18px">ℹ️</span><div class="text-muted" style="font-size:var(--fs-xs);line-height:1.5">Mengikuti pedoman <strong>BAZNAS</strong>: nisab 85 gram emas, kadar 2,5%, dengan syarat <strong>haul</strong> (kepemilikan 1 tahun) untuk zakat mal. Estimasi ini edukatif — untuk penyaluran resmi gunakan BAZNAS/LAZ terpercaya.</div></div></div>';
+  html += '<div class="card mt-4"><div class="card-header"><div class="card-title">Nisab & Pengaturan</div></div><div class="card-body">';
+  html += '<div class="form-group"><label class="form-label">Harga Emas / gram (Rp)</label><input type="number" class="form-input" id="zakatGoldPrice" value="' + (parseNumber(profile.goldPricePerGram) || Math.round(goldPrice)) + '" min="0" step="10000" onchange="onZakatChange()"></div>';
+  if (detected > 0) html += '<div class="text-muted" style="font-size:var(--fs-xs)">Terdeteksi dari aset emasmu: ' + formatRupiah(detected) + '/gram. Sesuaikan bila perlu.</div>';
+  html += '<div class="cashflow-grid" style="margin-top:var(--sp-3)">' + taxRow('Nisab (85 gram emas)', formatRupiah(nisab), 'total') + '</div>';
+  html += '<div class="form-row" style="margin-top:var(--sp-3)"><div class="form-group"><label class="form-label">Sudah haul (≥ 1 tahun)?</label><select class="form-select" id="zakatHaul" onchange="onZakatChange()"><option value="yes"' + (profile.haulMet ? ' selected' : '') + '>Ya</option><option value="no"' + (!profile.haulMet ? ' selected' : '') + '>Belum</option></select></div><div class="form-group"><label class="form-label">Tabungan tunai lain (Rp)</label><input type="number" class="form-input" id="zakatExtraCash" value="' + (profile.extraCash || '') + '" placeholder="0" min="0" step="100000" onchange="onZakatChange()"></div></div>';
+  html += '</div></div>';
+  html += '<div class="card mt-4"><div class="card-header"><div class="card-title">Zakat Mal</div>' + (reachNisab ? '<span class="on-track-badge on">Mencapai nisab</span>' : '<span class="on-track-badge over">Belum nisab</span>') + '</div><div class="card-body"><div class="cashflow-grid">';
+  html += taxRow('Emas & Logam Mulia', formatRupiah(za.gold), 'plus');
+  html += taxRow('Tabungan & Deposito', formatRupiah(totalCash), 'plus');
+  html += taxRow('Investasi (Saham, Crypto, Reksadana)', formatRupiah(za.invest), 'plus');
+  html += taxRow('Piutang', formatRupiah(za.piutang), 'plus');
+  html += taxRow('Total Harta Wajib Zakat', formatRupiah(totalHarta), 'total');
+  html += '</div>';
+  if (!reachNisab) { html += '<div class="empty-state" style="padding:var(--sp-4)"><div class="empty-state-text">Total hartamu belum mencapai nisab (' + formatRupiahShort(nisab) + '). Kurang ' + formatRupiahShort(nisab - totalHarta) + ' lagi untuk wajib zakat mal.</div></div>'; }
+  else if (!profile.haulMet) { html += '<div class="empty-state" style="padding:var(--sp-4)"><div class="empty-state-text">Harta sudah mencapai nisab. Bila genap haul (1 tahun), zakat yang dikeluarkan: <strong>' + formatRupiah(totalHarta * ZAKAT_RATE) + '</strong> (2,5%).</div></div>'; }
+  else { html += '<div class="cashflow-grid" style="margin-top:var(--sp-3)">' + taxRow('Zakat Mal (2,5%)', formatRupiah(zakatMal), 'total') + '</div>'; }
+  html += '</div></div>';
+  html += '<div class="card mt-4"><div class="card-header"><div class="card-title">Zakat Penghasilan</div></div><div class="card-body">';
+  html += '<div class="form-group"><label class="form-label">Sumber Penghasilan</label><select class="form-select" id="zakatIncomeMode" onchange="onZakatChange()"><option value="auto"' + (profile.useAutoIncome ? ' selected' : '') + '>Otomatis (dari transaksi)</option><option value="manual"' + (!profile.useAutoIncome ? ' selected' : '') + '>Input manual</option></select></div>';
+  if (profile.useAutoIncome) html += '<div class="text-muted" style="font-size:var(--fs-xs)">Disetahunkan dari rata-rata income ' + est.monthsElapsed + ' bulan (' + formatRupiahShort(est.avgMonthly) + '/bln × 12).</div>';
+  else html += '<div class="form-group"><label class="form-label">Penghasilan per Bulan (Rp)</label><input type="number" class="form-input" id="zakatManualIncome" value="' + (profile.manualMonthlyIncome || '') + '" placeholder="0" min="0" step="500000" onchange="onZakatChange()"></div>';
+  html += '<div class="cashflow-grid" style="margin-top:var(--sp-3)">' + taxRow('Penghasilan Setahun', formatRupiah(annualIncome), 'plus') + taxRow('Nisab Penghasilan (85 gr emas)', formatRupiah(nisab), 'minus') + '</div>';
+  if (incomeReachNisab) { html += '<div class="cashflow-grid" style="margin-top:var(--sp-3)">' + taxRow('Zakat / Bulan (2,5%)', formatRupiah(zakatIncomeMonth), 'minus') + taxRow('Zakat Penghasilan / Tahun', formatRupiah(zakatIncomeYear), 'total') + '</div>'; }
+  else { html += '<div class="empty-state" style="padding:var(--sp-4)"><div class="empty-state-text">Penghasilan setahun belum mencapai nisab, jadi belum wajib zakat penghasilan. Tetap dianjurkan bersedekah. 🤲</div></div>'; }
+  html += '</div></div>';
+  el.innerHTML = html;
+}
+async function onZakatChange() {
+  const profile = await getZakatProfile();
+  const gp = document.getElementById('zakatGoldPrice'); if (gp) profile.goldPricePerGram = parseNumber(gp.value);
+  const haul = document.getElementById('zakatHaul'); if (haul) profile.haulMet = haul.value === 'yes';
+  const ec = document.getElementById('zakatExtraCash'); if (ec) profile.extraCash = parseNumber(ec.value);
+  const mode = document.getElementById('zakatIncomeMode'); if (mode) profile.useAutoIncome = mode.value === 'auto';
+  const mi = document.getElementById('zakatManualIncome'); if (mi) profile.manualMonthlyIncome = parseNumber(mi.value);
+  await saveZakatProfile(profile);
+  await renderZakat();
 }
 
 /* ====== SEED DATA ====== */
